@@ -1334,30 +1334,39 @@ class ChatController:
 
     def _run_turn(self, texto: str) -> None:
         """Hilo de fondo: tasks + tokens + updates → cola de UI."""
+        from app.langfuse_chat import respuesta_del_grafo, trace_chat_turn
+
         estado = GrafoEstado(phase="judging")
         try:
-            for item in self.graph.stream(
-                {"messages": [HumanMessage(texto)]},
-                self.config,
-                stream_mode=["tasks", "messages", "updates"],
-            ):
-                if isinstance(item, tuple) and len(item) == 2:
-                    mode, data = item
-                elif isinstance(item, dict):
-                    mode, data = "updates", item
-                else:
-                    continue
-                estado = aplicar_evento(estado, str(mode), data)
-                nuevas = (
-                    lineas_de_update(data)
-                    if mode == "updates" and isinstance(data, dict)
-                    else []
-                )
+            with trace_chat_turn(
+                texto,
+                thread_id=self.thread_id,
+                modelo=self.modelo,
+                config=self.config,
+            ) as (config, set_output):
+                for item in self.graph.stream(
+                    {"messages": [HumanMessage(texto)]},
+                    config,
+                    stream_mode=["tasks", "messages", "updates"],
+                ):
+                    if isinstance(item, tuple) and len(item) == 2:
+                        mode, data = item
+                    elif isinstance(item, dict):
+                        mode, data = "updates", item
+                    else:
+                        continue
+                    estado = aplicar_evento(estado, str(mode), data)
+                    nuevas = (
+                        lineas_de_update(data)
+                        if mode == "updates" and isinstance(data, dict)
+                        else []
+                    )
 
-                def _apply(estado=estado, nuevas=nuevas) -> None:
-                    self._pintar_grafo(estado, nuevas)
+                    def _apply(estado=estado, nuevas=nuevas) -> None:
+                        self._pintar_grafo(estado, nuevas)
 
-                self._ui(_apply)
+                    self._ui(_apply)
+                set_output(respuesta_del_grafo(self.graph, config))
         except Exception as exc:
             # Timeout de demo u otro fallo: una fila roja, el grafo no se toca.
             msg = str(exc)
@@ -1409,4 +1418,9 @@ def run_tui(graph: Any, config: dict, *, modelo: str, thread_id: str) -> None:
 
     controller = ChatController(graph, config, modelo, thread_id)
     # render() es async; asyncio.run arranca el bucle hasta que quit() para el renderer.
-    asyncio.run(render(controller.app))
+    try:
+        asyncio.run(render(controller.app))
+    finally:
+        from app.langfuse_chat import shutdown_langfuse
+
+        shutdown_langfuse()

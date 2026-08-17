@@ -59,6 +59,9 @@ Vemos el resumen de pregunta, tool, dato, respuesta y validador, pero no el
 
 ## LangSmith
 
+La conexión (variables, región EU/US y el `403 Forbidden`) está en
+[`langsmith.md`](langsmith.md).
+
 [`02_langsmith.py`](../../observability/02_langsmith.py) activa el tracing
 con variables `LANGSMITH_*` y ejecuta el grafo con `invoke()`:
 
@@ -170,6 +173,7 @@ siendo el de [`04_juez_validador.md`](../langgraph/04_juez_validador.md).
 Buenas prácticas que se enseñan en esta clase:
 
 - usa `LANGSMITH_TRACING`, no nombres antiguos `LANGCHAIN_*`;
+- `LANGSMITH_ENDPOINT` debe coincidir con la región de la cuenta. Una clave EU contra `https://api.smith.langchain.com` (US) responde `403 Forbidden` en `/runs/multipart`. En EU: `https://eu.api.smith.langchain.com`;
 - usa `LANGFUSE_BASE_URL`, no `LANGFUSE_HOST`;
 - no imprimas valores de claves;
 - en un proceso corto llama siempre a `langfuse.shutdown()`;
@@ -179,6 +183,7 @@ Buenas prácticas que se enseñan en esta clase:
 
 | Fichero | Papel |
 |---|---|
+| [`langsmith.md`](langsmith.md) | Cómo se conecta LangSmith (región, `403`, variables) |
 | [`app/graph.py`](../../app/graph.py) | Define el grafo, modelo e hilo |
 | [`01_sin_obs.py`](../../observability/01_sin_obs.py) | Baseline |
 | [`02_langsmith.py`](../../observability/02_langsmith.py) | Árbol LangSmith |

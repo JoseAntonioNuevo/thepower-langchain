@@ -36,6 +36,7 @@ observabilidad (`observability/`) importa el mismo grafo.
     00_indice.md
     langgraph/
     observability/observabilidad.md
+    observability/langsmith.md
     tests.md
   tests/             # unittest, sin red ni OpenRouter
   requirements.txt
@@ -210,3 +211,4 @@ python observability/04_incidente.py
 ```
 
 Setup, claves y arquitectura: [docs/observability/observabilidad.md](docs/observability/observabilidad.md).
+Conexión LangSmith (región, `403`, variables): [docs/observability/langsmith.md](docs/observability/langsmith.md).

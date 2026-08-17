@@ -70,6 +70,7 @@ haya puesto `langgraph/` o `observability/` como primer directorio.
 | 4 | [`langgraph/04_juez_validador.md`](langgraph/04_juez_validador.md) | ¿Cómo se controla la calidad y el uso de web? |
 | 5 | [`langgraph/05_tui.md`](langgraph/05_tui.md) | ¿Cómo se transforma el grafo en una interfaz? |
 | 6 | [`observability/observabilidad.md`](observability/observabilidad.md) | ¿Cómo vemos lo que ocurrió en una ejecución? |
+| 6b | [`observability/langsmith.md`](observability/langsmith.md) | ¿Cómo se autentica y enruta la conexión a LangSmith? |
 | 7 | [`tests.md`](tests.md) | ¿Cómo sabemos que la lógica sigue funcionando? |
 
 Si te pierdes en una parte concreta:
@@ -80,6 +81,7 @@ Si te pierdes en una parte concreta:
 - juez, validador o reintentos → [`langgraph/04_juez_validador.md`](langgraph/04_juez_validador.md);
 - pantalla, teclado o streaming → [`langgraph/05_tui.md`](langgraph/05_tui.md);
 - trazas, tags o scores → [`observability/observabilidad.md`](observability/observabilidad.md);
+- `403 Forbidden`, región EU/US o `LANGSMITH_ENDPOINT` → [`observability/langsmith.md`](observability/langsmith.md);
 - mocks y tests sin red → [`tests.md`](tests.md).
 
 ## Setup

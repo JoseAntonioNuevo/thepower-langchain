@@ -1,0 +1,6 @@
+langchain>=1.0,<2.0
+langchain-core>=1.0,<2.0
+langgraph>=1.0,<2.0
+python-dotenv>=1.0
+langchain-openrouter>=0.2.8
+langfuse>=4.14.0
