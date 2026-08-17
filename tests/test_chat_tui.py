@@ -7,15 +7,15 @@ from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parents[1]
 if str(_ROOT) not in sys.path:
-    sys.path.insert(0, str(_ROOT))
+    sys.path.append(str(_ROOT))
 
 # Signal: estado reactivo. test_render: pinta la app en un buffer sin TTY real.
 from opentui import KeyEvent, Signal, test_render
 
-from utilities.chat_lines import ChatLine
+from ui.chat_lines import ChatLine
 from langchain_core.messages import AIMessage, AIMessageChunk
 
-from utilities.chat_tui import (
+from ui.chat_tui import (
     GrafoEstado,
     _color_espina,
     _cuerpo_juez,

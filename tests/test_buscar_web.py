@@ -9,9 +9,9 @@ from unittest.mock import patch
 
 _ROOT = Path(__file__).resolve().parents[1]
 if str(_ROOT) not in sys.path:
-    sys.path.insert(0, str(_ROOT))
+    sys.path.append(str(_ROOT))
 
-from utilities.buscar_web import (
+from app.buscar_web import (
     FALTA_CLAVE,
     _formatear_busqueda,
     _query_fechada,
@@ -88,8 +88,8 @@ class TestBuscarWeb(unittest.TestCase):
         }
         with (
             patch.dict(os.environ, {"TAVILY_API_KEY": "test-key"}, clear=False),
-            patch("utilities.buscar_web.TavilyClient") as cliente_cls,
-            patch("utilities.buscar_web.date") as date_cls,
+            patch("app.buscar_web.TavilyClient") as cliente_cls,
+            patch("app.buscar_web.date") as date_cls,
         ):
             os.environ.pop("DEMO_FORCE_TOOL_ERROR", None)
             date_cls.today.return_value = date(2026, 8, 17)
@@ -110,7 +110,7 @@ class TestBuscarWeb(unittest.TestCase):
     def test_error_de_busqueda(self):
         with (
             patch.dict(os.environ, {"TAVILY_API_KEY": "test-key"}, clear=False),
-            patch("utilities.buscar_web.TavilyClient") as cliente_cls,
+            patch("app.buscar_web.TavilyClient") as cliente_cls,
         ):
             os.environ.pop("DEMO_FORCE_TOOL_ERROR", None)
             cliente_cls.return_value.search.side_effect = RuntimeError("timeout")

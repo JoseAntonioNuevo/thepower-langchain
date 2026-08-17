@@ -1,14 +1,21 @@
 # Cómo funciona el chatbot 04: juez, Tavily y validador
 
-Este documento explica el ciclo de `lessons/04_chatbot.py` de punta a punta.
+Este documento explica el ciclo de `app/graph.py` de punta a punta.
 La lección 02 sigue usando el mock `buscar_clima`. Aquí el objetivo es otro:
 **cada nodo tiene un solo trabajo**, y los hechos actuales salen de internet
 (Tavily), no de un string fijo.
 
+Es la cuarta parada de la [guía completa del repositorio](../00_indice.md).
+Antes conviene leer [01 — grafo](01_grafo.md),
+[02 — tools](02_tools.md) y [03 — memoria](03_memoria.md). Después, la
+[TUI](05_tui.md), la
+[observabilidad](../observability/observabilidad.md) y los
+[tests](../tests.md) explican las capas que rodean este ciclo.
+
 Ejecuta siempre desde la raíz del repo:
 
 ```bash
-python lessons/04_chatbot.py
+python langgraph/04_chatbot.py
 ```
 
 Hace falta `OPENROUTER_API_KEY`. `TAVILY_API_KEY` hace falta para tiempo,
@@ -74,8 +81,8 @@ el tope del turno anterior bloquearía el siguiente.
 
 ## Nodo 1 — `juez`
 
-Archivo de lógica pura: [`utilities/juez.py`](../utilities/juez.py).
-El nodo en sí está en `04_chatbot.py`.
+Archivo de lógica pura: [`app/juez.py`](../../app/juez.py).
+El nodo en sí está en [`app/graph.py`](../../app/graph.py).
 
 1. Lee la última pregunta del usuario.
 2. Llama al modelo **sin tools** (`model.invoke`, no `stream`).
@@ -106,7 +113,7 @@ rechazada. Entonces el juez recibe también `motivo_validador`
 
 Mismo papel que en la lección 02: `bind_tools` + `stream`.
 
-La diferencia es `consigna_sistema` ([`utilities/fecha_hoy.py`](../utilities/fecha_hoy.py)):
+La diferencia es `consigna_sistema` ([`app/fecha_hoy.py`](../../app/fecha_hoy.py)):
 
 - `buscar_web` es la **única** tool con internet real (Tavily).
 - `buscar_clima` y `tendencia_ropa` son **mocks de clase**.
@@ -136,7 +143,7 @@ Tras el chatbot, `_despues_chatbot` mira la última llamada:
 | `buscar_clima` | Mock: `Soleado en {ciudad}` |
 | `tendencia_ropa` | Mock: chaqueta ligera |
 
-[`utilities/buscar_web.py`](../utilities/buscar_web.py) llama a Tavily así:
+[`app/buscar_web.py`](../../app/buscar_web.py) llama a Tavily así:
 
 - antepone la fecha de hoy a la query (`17 de agosto de 2026 — …`)
 - `search_depth="advanced"`
@@ -153,7 +160,7 @@ tool). Es el mismo bucle de la lección 02.
 
 ## Nodo 4 — `validador`
 
-Archivo: [`utilities/validador.py`](../utilities/validador.py).
+Archivo: [`app/validador.py`](../../app/validador.py).
 
 Orden:
 
@@ -189,7 +196,7 @@ validación.
 
 ## Qué ve la TUI
 
-[`utilities/chat_tui.py`](../utilities/chat_tui.py) ya no es
+[`ui/chat_tui.py`](../../ui/chat_tui.py) ya no es
 `START → LLM ⇄ tools → END`. El sidebar tiene cuatro cajas.
 
 Fases del chip:
@@ -203,7 +210,7 @@ Fases del chip:
 | `retrying` | reintenta |
 | `idle` | reposo |
 
-[`utilities/chat_lines.py`](../utilities/chat_lines.py) convierte los
+[`ui/chat_lines.py`](../../ui/chat_lines.py) convierte los
 updates de LangGraph en filas:
 
 - `juez: web · temperatura actual Barcelona`
@@ -236,14 +243,14 @@ motivo, y la TUI encendería `▲ reintenta`.
 
 | Fichero | Rol |
 |---|---|
-| [`lessons/04_chatbot.py`](../lessons/04_chatbot.py) | Monta el grafo (nodos + aristas). Se lee en clase. |
-| [`app/graph.py`](../app/graph.py) | Reexporta el mismo `graph` para la clase de observabilidad. |
-| [`utilities/juez.py`](../utilities/juez.py) | Consigna, parseo y rutas del juez. Sin red. |
-| [`utilities/validador.py`](../utilities/validador.py) | Heurística, parseo y tope de reintentos. |
-| [`utilities/buscar_web.py`](../utilities/buscar_web.py) | Cliente Tavily. |
-| [`utilities/fecha_hoy.py`](../utilities/fecha_hoy.py) | Fecha + consigna del chatbot. |
-| [`utilities/chat_tui.py`](../utilities/chat_tui.py) | Sidebar de cuatro nodos. |
-| [`utilities/chat_lines.py`](../utilities/chat_lines.py) | Updates → filas `juez` / `validador`. |
+| [`app/graph.py`](../../app/graph.py) | Monta el grafo (nodos + aristas). Se lee en clase. |
+| [`langgraph/04_chatbot.py`](../../langgraph/04_chatbot.py) | Arranca la TUI sobre ese `graph`. |
+| [`app/juez.py`](../../app/juez.py) | Consigna, parseo y rutas del juez. Sin red. |
+| [`app/validador.py`](../../app/validador.py) | Heurística, parseo y tope de reintentos. |
+| [`app/buscar_web.py`](../../app/buscar_web.py) | Cliente Tavily. |
+| [`app/fecha_hoy.py`](../../app/fecha_hoy.py) | Fecha + consigna del chatbot. |
+| [`ui/chat_tui.py`](../../ui/chat_tui.py) | Sidebar de cuatro nodos. |
+| [`ui/chat_lines.py`](../../ui/chat_lines.py) | Updates → filas `juez` / `validador`. |
 
 Los tests (`tests/test_juez.py`, `test_validador.py`, `test_buscar_web.py`,
 TUI y líneas) no llaman a OpenRouter ni a Tavily. Desde la raíz:
@@ -251,3 +258,11 @@ TUI y líneas) no llaman a OpenRouter ni a Tavily. Desde la raíz:
 ```bash
 python -m unittest discover -s tests
 ```
+
+Para continuar:
+
+- [TUI](05_tui.md): cómo el stream se convierte en
+  filas y estados visuales.
+- [Observabilidad](../observability/observabilidad.md): cómo se instrumenta este mismo
+  `graph` sin copiarlo.
+- [Tests](../tests.md): qué contratos se prueban sin servicios externos.

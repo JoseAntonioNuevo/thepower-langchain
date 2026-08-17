@@ -1,5 +1,5 @@
 {
   "venvPath": ".",
   "venv": ".venv",
-  "include": ["lessons", "utilities", "tests", "app"]
+  "include": ["langgraph", "observability", "app", "ui", "tests"]
 }

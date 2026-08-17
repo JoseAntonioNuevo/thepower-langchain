@@ -10,7 +10,7 @@ from datetime import date
 from typing import Any, Literal
 
 # Misma fecha en español que usa buscar_web y la consigna del chatbot.
-from utilities.fecha_hoy import _texto_fecha
+from app.fecha_hoy import _texto_fecha
 
 
 # Resultado del juez: tres campos que el grafo guarda en el State.

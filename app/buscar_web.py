@@ -13,7 +13,7 @@ from langchain.tools import tool
 from tavily import TavilyClient
 
 # Fecha en español: "17 de agosto de 2026". Gemma no sabe en qué año estamos.
-from utilities.fecha_hoy import _texto_fecha
+from app.fecha_hoy import _texto_fecha
 
 # Mensaje que ve el modelo (y la TUI) si falta la clave: el grafo no se rompe.
 FALTA_CLAVE = "Falta TAVILY_API_KEY en .env"

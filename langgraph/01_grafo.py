@@ -3,10 +3,10 @@
 import sys
 from pathlib import Path
 
-# Ejecutar ``python lessons/01_grafo.py`` debe encontrar utilities desde la raíz.
+# Ejecutar ``python langgraph/01_grafo.py`` debe encontrar ui desde la raíz.
 _ROOT = Path(__file__).resolve().parents[1]
 if str(_ROOT) not in sys.path:
-    sys.path.insert(0, str(_ROOT))
+    sys.path.append(str(_ROOT))
 
 # TypedDict describe un diccionario con claves fijas y tipos conocidos.
 from typing import TypedDict
@@ -51,7 +51,7 @@ graph = builder.compile()
 # Solo corre si ejecutas este archivo (no si lo importas desde otro módulo).
 if __name__ == "__main__":
 
-    from utilities.consola import BRIGHT, DATO, THINK, banner, grafo_ascii, panel
+    from ui.consola import BRIGHT, DATO, THINK, banner, grafo_ascii, panel
 
     # invoke() recorre el grafo una vez con el estado inicial.
     entrada = "hola thepower"

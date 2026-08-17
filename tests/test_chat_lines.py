@@ -6,12 +6,12 @@ from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parents[1]
 if str(_ROOT) not in sys.path:
-    sys.path.insert(0, str(_ROOT))
+    sys.path.append(str(_ROOT))
 
 # Mensajes reales de LangChain: el parser no debe depender de la TUI.
 from langchain_core.messages import AIMessage, AIMessageChunk, HumanMessage, ToolMessage
 
-from utilities.chat_lines import estado_de_update, lineas_de_update, lineas_del_turno
+from ui.chat_lines import estado_de_update, lineas_de_update, lineas_del_turno
 
 
 def _pares(lineas):

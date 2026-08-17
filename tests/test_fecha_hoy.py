@@ -8,9 +8,9 @@ from unittest.mock import patch
 
 _ROOT = Path(__file__).resolve().parents[1]
 if str(_ROOT) not in sys.path:
-    sys.path.insert(0, str(_ROOT))
+    sys.path.append(str(_ROOT))
 
-from utilities.fecha_hoy import _texto_fecha, consigna_sistema, fecha_hoy
+from app.fecha_hoy import _texto_fecha, consigna_sistema, fecha_hoy
 
 
 class TestFechaHoy(unittest.TestCase):
@@ -36,6 +36,6 @@ class TestFechaHoy(unittest.TestCase):
         self.assertIn("falta el número", texto)
 
     def test_tool_usa_hoy(self):
-        with patch("utilities.fecha_hoy.date") as date_cls:
+        with patch("app.fecha_hoy.date") as date_cls:
             date_cls.today.return_value = date(2026, 7, 19)
             self.assertEqual(fecha_hoy.invoke({}), "19 de julio de 2026")

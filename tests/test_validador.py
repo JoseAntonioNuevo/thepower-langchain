@@ -2,17 +2,17 @@
 
 import sys
 import unittest
-import importlib
 from pathlib import Path
 from unittest.mock import patch
 
 _ROOT = Path(__file__).resolve().parents[1]
 if str(_ROOT) not in sys.path:
-    sys.path.insert(0, str(_ROOT))
+    sys.path.append(str(_ROOT))
 
 from langchain_core.messages import AIMessage, AIMessageChunk, HumanMessage, ToolMessage
 
-from utilities.validador import (
+import app.graph as grafo
+from app.validador import (
     consigna_validador,
     debe_reintentar,
     parsear_veredicto,
@@ -75,7 +75,6 @@ class TestValidador(unittest.TestCase):
         self.assertIn("No uses tu conocimiento previo", texto)
 
     def test_nodo_validador_recibe_la_evidencia_web(self):
-        modulo = importlib.import_module("lessons.04_chatbot")
         mensajes = [
             HumanMessage("¿Quién ganó el Mundial de 2026?"),
             ToolMessage(
@@ -84,11 +83,11 @@ class TestValidador(unittest.TestCase):
                 tool_call_id="web-1",
             ),
         ]
-        with patch.object(modulo, "model") as modelo:
+        with patch.object(grafo, "model") as modelo:
             modelo.invoke.return_value = AIMessage(
                 "ok: si\nmotivo: coincide con buscar_web"
             )
-            resultado = modulo.validador(
+            resultado = grafo.validador(
                 {
                     "messages": mensajes,
                     "usar_web": True,
@@ -106,14 +105,12 @@ class TestValidador(unittest.TestCase):
         self.assertTrue(resultado["ok"])
 
     def test_chatbot_guarda_borrador_sin_publicarlo(self):
-        modulo = importlib.import_module("lessons.04_chatbot")
-
         class ModeloFalso:
             def stream(self, _mensajes):
                 yield AIMessageChunk(content="Respuesta todavía no aprobada.")
 
-        with patch.object(modulo, "model_with_tools", ModeloFalso()):
-            resultado = modulo.chatbot(
+        with patch.object(grafo, "model_with_tools", ModeloFalso()):
+            resultado = grafo.chatbot(
                 {"messages": [HumanMessage("Pregunta de prueba")]}
             )
 
@@ -121,8 +118,7 @@ class TestValidador(unittest.TestCase):
         self.assertNotIn("messages", resultado)
 
     def test_publicar_respuesta_solo_emite_el_borrador_aprobado(self):
-        modulo = importlib.import_module("lessons.04_chatbot")
-        resultado = modulo.publicar_respuesta(
+        resultado = grafo.publicar_respuesta(
             {
                 "messages": [HumanMessage("Pregunta de prueba")],
                 "draft": "Respuesta aprobada.",
@@ -133,9 +129,8 @@ class TestValidador(unittest.TestCase):
         self.assertEqual(resultado["messages"][0].content, "Respuesta aprobada.")
 
     def test_validador_ok_ruta_a_publicar(self):
-        modulo = importlib.import_module("lessons.04_chatbot")
         self.assertEqual(
-            modulo._despues_validador({"ok": True, "intentos": 0}),
+            grafo._despues_validador({"ok": True, "intentos": 0}),
             "publicar",
         )
 

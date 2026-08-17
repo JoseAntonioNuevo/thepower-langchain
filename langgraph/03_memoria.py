@@ -5,10 +5,10 @@ import sys
 import time
 from pathlib import Path
 
-# Ejecutar ``python lessons/03_memoria.py`` debe encontrar utilities desde la raíz.
+# Ejecutar ``python langgraph/03_memoria.py`` debe encontrar ui desde la raíz.
 _ROOT = Path(__file__).resolve().parents[1]
 if str(_ROOT) not in sys.path:
-    sys.path.insert(0, str(_ROOT))
+    sys.path.append(str(_ROOT))
 
 # Annotated une el tipo de la lista con el reducer add_messages.
 from typing import Annotated, TypedDict
@@ -71,7 +71,7 @@ graph = builder.compile(checkpointer=InMemorySaver())
 
 if __name__ == "__main__":
 
-    from utilities.consola import BRIGHT, DATO, THINK, banner, grafo_ascii, panel, spinner
+    from ui.consola import BRIGHT, DATO, THINK, banner, grafo_ascii, panel, spinner
 
     # config.configurable.thread_id = "carpeta" de conversación.
     # Mismo id → mismo historial. Otro id → conversación vacía e independiente.

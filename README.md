@@ -2,36 +2,49 @@
 
 Grafo explícito → tools → memoria → chatbot. 90 min, thePower AI Engineer.
 
-El repo enseña LangGraph en cuatro scripts. Los helpers (tools, TUI) viven en `utilities/`; los tests en `tests/`; el grafo de `04` también se exporta en `app/` para la clase de observabilidad.
+El repo enseña LangGraph en cuatro scripts de `langgraph/`. El agente vive en
+`app/`; la consola y la TUI en `ui/`; los tests en `tests/`. La clase de
+observabilidad (`observability/`) importa el mismo grafo.
 
 ## Organización
 
 ```
 1-langGraph/
-  lessons/           # Scripts de clase (se ejecutan desde la raíz)
+  langgraph/            # Scripts del 5 oct (se ejecutan desde la raíz)
     01_grafo.py
     02_tools.py
     03_memoria.py
-    04_chatbot.py
-  utilities/         # Tools y TUI que reutilizan 04, app y los tests
-    buscar_web.py
-    fecha_hoy.py
+    04_chatbot.py    # Arranca la TUI; el ciclo vive en app/graph.py
+  observability/            # Scripts del 7 oct: LangSmith + Langfuse
+    01_sin_obs.py
+    02_langsmith.py
+    03_langfuse.py
+    04_incidente.py
+    _comun.py
+  app/               # Grafo, juez, validador y tools
+    graph.py
     juez.py
     validador.py
+    fecha_hoy.py
+    buscar_web.py
+  ui/                # Consola de 01–03 y TUI de 04
+    consola.py
     chat_input.py
     chat_lines.py
     chat_tui.py
-    consola.py
-  docs/              # Explicación en español del ciclo de 04
-    04_juez_validador.md
+  docs/
+    00_indice.md
+    langgraph/
+    observability/observabilidad.md
+    tests.md
   tests/             # unittest, sin red ni OpenRouter
-  app/graph.py       # Reexporta el grafo de 04, sin TUI (7 oct)
   requirements.txt
   .env.example
 ```
 
-Ejecuta siempre desde la raíz del repo. Los scripts de `lessons/` y
-`app/graph.py` añaden esa raíz a `sys.path` para importar `utilities`.
+Ejecuta siempre desde la raíz del repo. Los scripts de `langgraph/` y `observability/`
+añaden esa raíz al final de `sys.path` para importar `app` y `ui` sin tapar
+el paquete `langgraph`.
 
 ## Setup
 
@@ -57,18 +70,20 @@ Pega tu clave en `.env` ([openrouter.ai/settings/keys](https://openrouter.ai/set
 | `python-dotenv` | `load_dotenv()` lee `.env` (02–04, `app`) |
 | `opentui` | TUI a pantalla completa de `04` (`chat_tui`) |
 | `tavily-python` | Cliente de búsqueda en `buscar_web` (04 / `app`) |
+| `langsmith` | Trazas de Clase 2 (`LANGSMITH_TRACING`) |
+| `langfuse` | Trazas y scores de Clase 2 (SDK v4) |
 
 Modelo: `google/gemma-4-31b-it` vía OpenRouter, Cerebras primero (`order`, no `only`). Si Cerebras da 429, OpenRouter usa otro proveedor. Espera unos segundos entre 02, 03 y 04.
 
-## Lessons
+## Clase 1
 
 Desde la raíz:
 
 ```bash
-python lessons/01_grafo.py     # sin clave
-python lessons/02_tools.py
-python lessons/03_memoria.py
-python lessons/04_chatbot.py   # TUI; salir/q o Esc
+python langgraph/01_grafo.py     # sin clave
+python langgraph/02_tools.py
+python langgraph/03_memoria.py
+python langgraph/04_chatbot.py   # TUI; salir/q o Esc
 ```
 
 ### `01_grafo.py` — un grafo es funciones + aristas (~12 min)
@@ -76,6 +91,7 @@ python lessons/04_chatbot.py   # TUI; salir/q o Esc
 Sin LLM. Un nodo pasa `"hola thepower"` a mayúsculas.
 La salida incluye un banner de lección, el recorrido ASCII del grafo y paneles
 con el estado antes/después.
+Explicación paso a paso: [docs/langgraph/01_grafo.md](docs/langgraph/01_grafo.md).
 
 | Usa | No usa |
 |---|---|
@@ -86,6 +102,7 @@ con el estado antes/después.
 El modelo pide `buscar_clima` (mock local). Un `invoke`, sin memoria entre turnos.
 La espera del modelo muestra un spinner y el resultado separa pregunta, tool
 solicitada, dato devuelto y respuesta final.
+Explicación del protocolo de tools: [docs/langgraph/02_tools.md](docs/langgraph/02_tools.md).
 
 | Usa | No usa |
 |---|---|
@@ -99,6 +116,7 @@ solicitada, dato devuelto y respuesta final.
 Tres `invoke`: mismo hilo recuerda el nombre; otro hilo empieza vacío. El `State` no es la memoria.
 Cada turno aparece en un panel etiquetado con su hilo y las pausas anti-429
 mantienen feedback visual con un spinner.
+Explicación de memoria y checkpointer: [docs/langgraph/03_memoria.md](docs/langgraph/03_memoria.md).
 
 | Usa | No usa |
 |---|---|
@@ -108,13 +126,16 @@ mantienen feedback visual con un spinner.
 
 ### `04_chatbot.py` — juez + tools + validador + TUI (~20 min)
 
-Cada nodo tiene un trabajo: `juez` decide si hace falta internet, `chatbot`
-redacta (y puede pedir tools), `tools` ejecuta Tavily/`fecha_hoy`/mocks,
-`validador` acepta o manda otra vuelta al juez (como mucho un reintento), y
-`publicar` muestra al usuario el borrador solo después de un `ok`.
-Cómo funciona cada nodo, el State y Tavily: [docs/04_juez_validador.md](docs/04_juez_validador.md).
+El ciclo vive en [`app/graph.py`](app/graph.py). Cada nodo tiene un trabajo:
+`juez` decide si hace falta internet, `chatbot` redacta (y puede pedir tools),
+`tools` ejecuta Tavily/`fecha_hoy`/mocks, `validador` acepta o manda otra
+vuelta al juez (como mucho un reintento), y `publicar` muestra al usuario el
+borrador solo después de un `ok`.
+Cómo funciona cada nodo, el State y Tavily: [docs/langgraph/04_juez_validador.md](docs/langgraph/04_juez_validador.md).
 Tools: `fecha_hoy`, `buscar_clima` (mock), `tendencia_ropa` (mock), `buscar_web`
-(Tavily). La TUI está en `utilities/chat_tui.py` y pinta el ciclo completo.
+(Tavily). La TUI está en `ui/chat_tui.py` y pinta el ciclo completo.
+La capa de interfaz se explica en
+[docs/langgraph/05_tui.md](docs/langgraph/05_tui.md).
 El composer tiene foco real, caret parpadeante, edición multilínea, pegar, selección,
 undo, `Enter` para enviar, `Shift+Enter` para nueva línea y `↑`/`↓` para
 recuperar el historial. `Esc` o `salir`/`q` cierran la sesión.
@@ -122,25 +143,30 @@ recuperar el historial. `Esc` o `salir`/`q` cierran la sesión.
 | Usa | No usa |
 |---|---|
 | Todo lo de 02 y 03 | — |
-| `utilities.fecha_hoy`, `utilities.buscar_web` | |
-| `utilities.juez`, `utilities.validador` | |
-| `utilities.chat_tui` → `opentui` | |
+| `app.fecha_hoy`, `app.buscar_web` | |
+| `app.juez`, `app.validador` | |
+| `ui.chat_tui` → `opentui` | |
 | `tavily-python` (vía `buscar_web`; opcional) | |
 
-## Utilities
+## `app/` y `ui/`
+
+Descripción didáctica de la interfaz: [docs/langgraph/05_tui.md](docs/langgraph/05_tui.md).
 
 | Módulo | Qué hace | Dependencias |
 |---|---|---|
-| `fecha_hoy.py` | Tool: fecha de hoy + consigna de sistema | `langchain` (`@tool`) |
-| `buscar_web.py` | Tool Tavily (advanced, query fechada); sin clave avisa | `langchain`, `tavily-python` |
-| `juez.py` | Parseo del veredicto ¿usar web? y ruta tras el LLM | stdlib |
-| `validador.py` | Heurística + parseo ok/reintenta (tope 1) | stdlib |
-| `chat_input.py` | Historial y borrador del composer | stdlib |
-| `chat_lines.py` | Parser puro: updates de LangGraph → filas de chat | stdlib |
-| `chat_tui.py` | TUI OpenTUI; el grafo se pasa desde fuera | `opentui`, `langchain-core`, `chat_lines` |
-| `consola.py` | Banners, paneles, grafos ASCII y spinner para 01–03 | stdlib |
+| `app/fecha_hoy.py` | Tool: fecha de hoy + consigna de sistema | `langchain` (`@tool`) |
+| `app/buscar_web.py` | Tool Tavily (advanced, query fechada); sin clave avisa | `langchain`, `tavily-python` |
+| `app/juez.py` | Parseo del veredicto ¿usar web? y ruta tras el LLM | stdlib |
+| `app/validador.py` | Heurística + parseo ok/reintenta (tope 1) | stdlib |
+| `app/graph.py` | State, nodos y grafo compilado | LangGraph, OpenRouter |
+| `ui/chat_input.py` | Historial y borrador del composer | stdlib |
+| `ui/chat_lines.py` | Parser puro: updates de LangGraph → filas de chat | stdlib |
+| `ui/chat_tui.py` | TUI OpenTUI; el grafo se pasa desde fuera | `opentui`, `langchain-core`, `chat_lines` |
+| `ui/consola.py` | Banners, paneles, grafos ASCII y spinner para 01–03 | stdlib |
 
 ## Tests
+
+Qué se prueba y por qué: [docs/tests.md](docs/tests.md).
 
 Sin red ni OpenRouter. Desde la raíz:
 
@@ -161,6 +187,26 @@ python -m unittest discover -s tests
 
 ## `app/graph.py` (7 oct)
 
-Reexporta `graph`, `MODELO` y `thread_id` de `lessons/04_chatbot.py`. La clase de observabilidad lo importa y lo instrumenta; no reescribe el ciclo.
+Define `graph`, `MODELO` y `thread_id`. La clase de observabilidad lo importa
+y lo instrumenta; no reescribe el ciclo.
 
 Dependencias: las de `04` excepto `opentui`.
+
+Mapa general y orden de lectura: [docs/00_indice.md](docs/00_indice.md).
+
+## Clase 2 — 7 oct
+
+Observabilidad sobre **el mismo grafo**: [`observability/`](observability/).
+Los scripts importan `app/graph.py`; no hay un segundo agente.
+
+La pregunta de demo es el tiempo en Madrid. El juez de 04 manda a `buscar_web`
+(Tavily opcional). `DEMO_FORCE_TOOL_ERROR=1` ya está en las tools de Clase 1.
+
+```bash
+python observability/01_sin_obs.py
+python observability/02_langsmith.py
+python observability/03_langfuse.py
+python observability/04_incidente.py
+```
+
+Setup, claves y arquitectura: [docs/observability/observabilidad.md](docs/observability/observabilidad.md).

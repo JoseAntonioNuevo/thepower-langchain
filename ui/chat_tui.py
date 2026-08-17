@@ -35,8 +35,8 @@ from opentui.components.markdown import MarkdownRenderable
 from opentui.input.keymapping import KeyBinding
 
 # Parser puro: mensajes LangGraph → filas + (nodo, nombres de tools).
-from utilities.chat_lines import ChatLine, estado_de_update, lineas_de_update
-from utilities.chat_input import HistorialComposer, indice_cursor
+from ui.chat_lines import ChatLine, estado_de_update, lineas_de_update
+from ui.chat_input import HistorialComposer, indice_cursor
 
 # Primera fila del chat: una pregunta que recorre juez → Tavily → validador.
 HINT = "Prueba: ¿Qué temperatura hace ahora en Madrid?"

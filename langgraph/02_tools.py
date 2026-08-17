@@ -4,10 +4,10 @@ import os
 import sys
 from pathlib import Path
 
-# Ejecutar ``python lessons/02_tools.py`` debe encontrar utilities desde la raíz.
+# Ejecutar ``python langgraph/02_tools.py`` debe encontrar ui desde la raíz.
 _ROOT = Path(__file__).resolve().parents[1]
 if str(_ROOT) not in sys.path:
-    sys.path.insert(0, str(_ROOT))
+    sys.path.append(str(_ROOT))
 
 # Annotated añade metadatos a un tipo; aquí une la lista de mensajes con un reducer.
 from typing import Annotated, TypedDict
@@ -105,7 +105,7 @@ graph = builder.compile()
 
 if __name__ == "__main__":
 
-    from utilities.consola import BRIGHT, DATO, THINK, TOOL, banner, grafo_ascii, panel, spinner
+    from ui.consola import BRIGHT, DATO, THINK, TOOL, banner, grafo_ascii, panel, spinner
 
     pregunta = "¿Qué tiempo hace en Madrid?"
     print(banner("02", "Tools: bind_tools + ToolNode", 18))

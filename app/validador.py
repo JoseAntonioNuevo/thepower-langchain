@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from typing import Any, Literal
 
 # Reutilizamos el parseo "clave: valor" y los sí/no del juez (mismo formato).
-from utilities.juez import _campos_etiquetados, _SI, _NO
+from app.juez import _SI, _NO, _campos_etiquetados
 
 # Un rechazo (intentos=1) reintenta; el segundo (intentos=2) cierra el ciclo.
 MAX_REINTENTOS = 1

@@ -2,7 +2,7 @@
 
 import unittest
 
-from utilities.chat_input import HistorialComposer, indice_cursor
+from ui.chat_input import HistorialComposer, indice_cursor
 
 
 class TestHistorialComposer(unittest.TestCase):

@@ -11,3 +11,7 @@ python-dotenv>=1.2.3
 opentui>=0.1.2
 # Cliente de búsqueda web (tool buscar_web en 04).
 tavily-python>=0.7.0
+# Trazas LangSmith (LANGSMITH_TRACING). Ya venía en tránsito con LangChain.
+langsmith>=0.3.45
+# Trazas y scores Langfuse v4 (get_client + langfuse.langchain.CallbackHandler).
+langfuse>=4.14.0

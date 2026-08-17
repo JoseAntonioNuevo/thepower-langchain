@@ -8,7 +8,7 @@ import time
 import unittest
 from unittest.mock import patch
 
-from utilities.consola import banner, grafo_ascii, panel, spinner
+from ui.consola import banner, grafo_ascii, panel, spinner
 
 
 class _TtyBuffer(io.StringIO):
