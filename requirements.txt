@@ -1,0 +1,13 @@
+# Grafo (StateGraph, ToolNode, checkpointer).
+langgraph>=1.2.11
+# @tool y piezas de LangChain que usan 02–04.
+langchain>=1.3.15
+langchain-core>=1.5.5
+# Cliente del modelo vía OpenRouter (Cerebras primero).
+langchain-openrouter>=0.2.8
+# load_dotenv: lee .env (OPENROUTER_API_KEY) sin exportar a mano.
+python-dotenv>=1.2.3
+# TUI a pantalla completa del 04 (puerto Python de OpenTUI).
+opentui>=0.1.2
+# Cliente de búsqueda web (tool buscar_web en 04).
+tavily-python>=0.7.0
