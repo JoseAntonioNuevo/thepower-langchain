@@ -21,6 +21,7 @@ if str(_ROOT) not in sys.path:
     sys.path.append(str(_ROOT))
 
 from dotenv import load_dotenv
+from langchain_core.runnables import RunnableConfig
 
 # Misma pregunta que la lección 02. En el grafo de 04 el juez manda a buscar_web.
 PREGUNTA = "¿Qué tiempo hace en Madrid?"
@@ -78,10 +79,10 @@ def config_base(
     leccion: str,
     tags: list[str],
     callbacks: list[Any] | None = None,
-) -> dict[str, Any]:
+) -> RunnableConfig:
     """RunnableConfig: mismo hilo de Clase 1 + sufijo para no mezclar trazas."""
     hashed = user_id_hash()
-    config: dict[str, Any] = {
+    config: RunnableConfig = {
         "configurable": {"thread_id": f"{thread_id}-c2-{leccion}"},
         "tags": tags,
         "metadata": {"user_id": hashed, "lesson": leccion},
@@ -89,6 +90,12 @@ def config_base(
     if callbacks:
         config["callbacks"] = callbacks
     return config
+
+
+def hilo_de(config: RunnableConfig) -> str:
+    """thread_id que config_base pone en configurable. TypedDict lo marca opcional."""
+    extra = config.get("configurable") or {}
+    return str(extra.get("thread_id") or "")
 
 
 def _texto(content: Any) -> str:

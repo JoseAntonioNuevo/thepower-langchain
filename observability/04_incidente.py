@@ -10,6 +10,7 @@ from _comun import (
     asegurar_openrouter,
     config_base,
     esperando,
+    hilo_de,
     imprimir_resumen,
     preparar_entorno,
     puntuaciones,
@@ -54,7 +55,7 @@ if __name__ == "__main__":
         tags=["clase-2", "incidente", "thepower"],
         callbacks=[handler],
     )
-    session_id = config["configurable"]["thread_id"]
+    session_id = hilo_de(config)
     t0 = time.perf_counter()
     try:
         with langfuse.start_as_current_observation(
@@ -74,7 +75,7 @@ if __name__ == "__main__":
             info = resumen(resultado)
             scores = puntuaciones(info, latencia)
             for nombre, valor in scores.items():
-                span.score_trace(name=nombre, value=valor, data_type="NUMERIC")
+                span.score_trace(name=nombre, value=valor)
     finally:
         langfuse.shutdown()
 

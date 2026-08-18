@@ -6,6 +6,7 @@ from _comun import (
     asegurar_openrouter,
     config_base,
     esperando,
+    hilo_de,
     imprimir_resumen,
     preparar_entorno,
     resumen,
@@ -73,7 +74,7 @@ if __name__ == "__main__":
         panel(
             "en la UI",
             "Abre el proyecto LANGSMITH_PROJECT. Deberías ver el árbol:\n"
-            f"thread_id={config['configurable']['thread_id']}\n"
+            f"thread_id={hilo_de(config)}\n"
             "metadata.user_id = hash · tags = clase-2, langsmith, thepower",
             THINK,
         )
