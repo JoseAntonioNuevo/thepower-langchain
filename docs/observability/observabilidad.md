@@ -16,6 +16,13 @@ from app.graph import MODELO, graph, thread_id
 No hay un segundo chatbot ni una copia del ciclo. Si cambia
 [`app/graph.py`](../../app/graph.py), las demos de observabilidad ven ese cambio.
 
+La TUI de [`langgraph/04_chatbot.py`](../../langgraph/04_chatbot.py) también
+emite: LangSmith si `LANGSMITH_TRACING=true`, Langfuse (un trace
+`handle-chat-turn` por turno, sesión `usuario_123`) vía
+[`app/langfuse_chat.py`](../../app/langfuse_chat.py) si hay `LANGFUSE_*`.
+Los scripts de esta carpeta siguen siendo la lección (baseline, scores,
+incidente). `langgraph-agent/` es otro grafo; no usa `app.graph`.
+
 Pregunta de demo: `¿Qué tiempo hace en Madrid?`. En 04 el juez marca `usar_web`
 y el chatbot llama a `buscar_web`. Sin `TAVILY_API_KEY` la tool avisa y el grafo
 sigue. `DEMO_FORCE_TOOL_ERROR=1` (ya en Clase 1) simula un timeout.

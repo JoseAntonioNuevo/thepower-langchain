@@ -4,7 +4,8 @@ Grafo explícito → tools → memoria → chatbot. 90 min, thePower AI Engineer
 
 El repo enseña LangGraph en cuatro scripts de `langgraph/`. El agente vive en
 `app/`; la consola y la TUI en `ui/`; los tests en `tests/`. La clase de
-observabilidad (`observability/`) importa el mismo grafo.
+observabilidad (`observability/`) importa el mismo grafo. `langgraph-agent/`
+es un calculador aislado del quickstart oficial (otro venv, otro grafo).
 
 ## Organización
 
@@ -21,17 +22,22 @@ observabilidad (`observability/`) importa el mismo grafo.
     03_langfuse.py
     04_incidente.py
     _comun.py
-  app/               # Grafo, juez, validador y tools
+  app/               # Grafo, juez, validador, tools y tracing de la TUI
     graph.py
     juez.py
     validador.py
     fecha_hoy.py
     buscar_web.py
+    langfuse_chat.py
   ui/                # Consola de 01–03 y TUI de 04
     consola.py
     chat_input.py
     chat_lines.py
     chat_tui.py
+  langgraph-agent/   # Quickstart Graph API (venv propio; no es el grafo de clase)
+    agent.py
+    requirements.txt
+    README.md
   docs/
     00_indice.md
     langgraph/
@@ -43,9 +49,9 @@ observabilidad (`observability/`) importa el mismo grafo.
   .env.example
 ```
 
-Ejecuta siempre desde la raíz del repo. Los scripts de `langgraph/` y `observability/`
-añaden esa raíz al final de `sys.path` para importar `app` y `ui` sin tapar
-el paquete `langgraph`.
+Ejecuta los scripts de `langgraph/` y `observability/` desde la **raíz** del
+repo (no desde `langgraph-agent/`). Añaden esa raíz al final de `sys.path`
+para importar `app` y `ui` sin tapar el paquete `langgraph`.
 
 ## Setup
 
@@ -56,9 +62,26 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-Pega tu clave en `.env` ([openrouter.ai/settings/keys](https://openrouter.ai/settings/keys)). `TAVILY_API_KEY` hace falta para hechos actuales (tiempo, resultados, noticias); sin ella `04` sigue el grafo y `buscar_web` avisa que falta la clave ([tavily.com](https://www.tavily.com)).
+Copia [`.env.example`](.env.example) y rellena las claves. No las pegues en
+chat, commits ni trazas.
+
+| Variable | Para qué |
+|---|---|
+| `OPENROUTER_API_KEY` | Modelo en `02`–`04`, TUI, observabilidad y `langgraph-agent` ([keys](https://openrouter.ai/settings/keys)) |
+| `OPENROUTER_BASE_URL` | Por defecto `https://openrouter.ai/api/v1` |
+| `OPENROUTER_MODEL` | Por defecto `google/gemma-4-31b-it` |
+| `OPENROUTER_PROVIDER` | Upstream preferido (`Cerebras`; `order`, no `only`) |
+| `TAVILY_API_KEY` | Hechos actuales en `buscar_web`. Sin ella `04` sigue y la tool avisa ([tavily.com](https://www.tavily.com)) |
+| `LANGSMITH_TRACING` | `true` → la TUI y LangGraph emiten a LangSmith solos |
+| `LANGSMITH_API_KEY` | Auth LangSmith |
+| `LANGSMITH_PROJECT` | Proyecto en la UI (`thepower-clase-2`) |
+| `LANGSMITH_ENDPOINT` | **Debe coincidir con la región de la cuenta.** EU: `https://eu.api.smith.langchain.com`. Una clave EU contra el host US responde `403 Forbidden` en `/runs/multipart` |
+| `LANGFUSE_PUBLIC_KEY` / `LANGFUSE_SECRET_KEY` | TUI (`04`), scripts `03`/`04` de observabilidad y `langgraph-agent` |
+| `LANGFUSE_BASE_URL` | Host Langfuse (`https://cloud.langfuse.com` en EU). No uses `LANGFUSE_HOST` |
 
 `01` no necesita claves. `02`–`04` y `app/graph.py` sí (`OPENROUTER_API_KEY`).
+Sin claves Langfuse la TUI sigue; no envía trazas. Sin `LANGSMITH_TRACING=true`
+tampoco van a LangSmith.
 
 ## Dependencias (`requirements.txt`)
 
@@ -71,8 +94,8 @@ Pega tu clave en `.env` ([openrouter.ai/settings/keys](https://openrouter.ai/set
 | `python-dotenv` | `load_dotenv()` lee `.env` (02–04, `app`) |
 | `opentui` | TUI a pantalla completa de `04` (`chat_tui`) |
 | `tavily-python` | Cliente de búsqueda en `buscar_web` (04 / `app`) |
-| `langsmith` | Trazas de Clase 2 (`LANGSMITH_TRACING`) |
-| `langfuse` | Trazas y scores de Clase 2 (SDK v4) |
+| `langsmith` | Trazas de la TUI y de Clase 2 (`LANGSMITH_TRACING`) |
+| `langfuse` | Trazas v4: TUI (`app/langfuse_chat.py`), scripts `03`/`04` y `langgraph-agent` |
 
 Modelo: `google/gemma-4-31b-it` vía OpenRouter, Cerebras primero (`order`, no `only`). Si Cerebras da 429, OpenRouter usa otro proveedor. Espera unos segundos entre 02, 03 y 04.
 
@@ -141,12 +164,19 @@ El composer tiene foco real, caret parpadeante, edición multilínea, pegar, sel
 undo, `Enter` para enviar, `Shift+Enter` para nueva línea y `↑`/`↓` para
 recuperar el historial. `Esc` o `salir`/`q` cierran la sesión.
 
+Si `.env` tiene LangSmith, cada turno aparece en el proyecto
+`LANGSMITH_PROJECT`. Si tiene Langfuse, `app/langfuse_chat.py` envía un
+trace `handle-chat-turn` por mensaje (sesión = `thread_id`, aquí
+`usuario_123`; tags `chatbot` / `tui`). Reinicia la TUI después de cambiar
+código o claves.
+
 | Usa | No usa |
 |---|---|
 | Todo lo de 02 y 03 | — |
 | `app.fecha_hoy`, `app.buscar_web` | |
 | `app.juez`, `app.validador` | |
 | `ui.chat_tui` → `opentui` | |
+| `app.langfuse_chat` → `langfuse` (si hay claves) | |
 | `tavily-python` (vía `buscar_web`; opcional) | |
 
 ## `app/` y `ui/`
@@ -160,9 +190,10 @@ Descripción didáctica de la interfaz: [docs/langgraph/05_tui.md](docs/langgrap
 | `app/juez.py` | Parseo del veredicto ¿usar web? y ruta tras el LLM | stdlib |
 | `app/validador.py` | Heurística + parseo ok/reintenta (tope 1) | stdlib |
 | `app/graph.py` | State, nodos y grafo compilado | LangGraph, OpenRouter |
+| `app/langfuse_chat.py` | Un trace Langfuse por turno de la TUI; no-op sin claves | `langfuse` |
 | `ui/chat_input.py` | Historial y borrador del composer | stdlib |
 | `ui/chat_lines.py` | Parser puro: updates de LangGraph → filas de chat | stdlib |
-| `ui/chat_tui.py` | TUI OpenTUI; el grafo se pasa desde fuera | `opentui`, `langchain-core`, `chat_lines` |
+| `ui/chat_tui.py` | TUI OpenTUI; el grafo se pasa desde fuera | `opentui`, `langchain-core`, `chat_lines`, `app.langfuse_chat` |
 | `ui/consola.py` | Banners, paneles, grafos ASCII y spinner para 01–03 | stdlib |
 
 ## Tests
@@ -210,5 +241,24 @@ python observability/03_langfuse.py
 python observability/04_incidente.py
 ```
 
+La TUI de `04` usa las mismas plataformas: LangSmith si `LANGSMITH_TRACING=true`,
+Langfuse si hay `LANGFUSE_*`. Los scripts de esta carpeta son la lección
+(baseline, scores, incidente); no son el único camino que emite trazas.
+
 Setup, claves y arquitectura: [docs/observability/observabilidad.md](docs/observability/observabilidad.md).
 Conexión LangSmith (región, `403`, variables): [docs/observability/langsmith.md](docs/observability/langsmith.md).
+
+## `langgraph-agent/` — quickstart aislado
+
+Calculador del [Graph API quickstart](https://docs.langchain.com/oss/python/langgraph/quickstart).
+No importa `app/graph.py`. Venv y `requirements.txt` propios; el `.env` es el
+de la raíz. LangSmith se apaga; Langfuse usa `CallbackHandler` y sesión
+`langgraph-agent-demo`. Detalle: [`langgraph-agent/README.md`](langgraph-agent/README.md).
+
+```bash
+cd langgraph-agent
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python agent.py    # "Add 3 and 4."
+```

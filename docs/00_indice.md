@@ -13,10 +13,13 @@ El repositorio enseña a construir un asistente por capas:
 3. **Memoria**: un `checkpointer` conserva conversaciones por `thread_id`.
 4. **Control de calidad**: juez, chatbot, tools, validador y publicación.
 5. **Interfaz**: una TUI muestra el recorrido del grafo.
-6. **Observabilidad**: LangSmith y Langfuse registran el mismo grafo.
+6. **Observabilidad**: LangSmith y Langfuse registran el mismo grafo (scripts
+   de `observability/` y también cada turno de la TUI de `04`).
 7. **Tests**: la lógica determinista se verifica sin APIs reales.
 
 La Clase 2 no crea otro agente: importa el grafo de la Clase 1 y lo observa.
+`langgraph-agent/` es un calculador aparte (quickstart oficial), no el ciclo
+de clase.
 
 ```mermaid
 flowchart LR
@@ -39,8 +42,9 @@ flowchart LR
 |---|---|---|
 | [`langgraph/`](../langgraph/) | Scripts del 5 oct | `01` a `04` muestran la evolución |
 | [`observability/`](../observability/) | Scripts del 7 oct | Instrumentan `app.graph` |
-| [`app/`](../app/) | Grafo, juez, validador y tools | Fuente de verdad del agente |
+| [`app/`](../app/) | Grafo, juez, validador, tools y `langfuse_chat` | Fuente de verdad del agente |
 | [`ui/`](../ui/) | Consola de 01–03 y TUI de 04 | Presentación, fácil de probar |
+| [`langgraph-agent/`](../langgraph-agent/) | Quickstart Graph API | Otro venv; no importa `app.graph` |
 | [`tests/`](../tests/) | Tests unitarios y smoke tests | No llaman a OpenRouter ni a Tavily |
 | [`docs/`](./) | Explicaciones para alumnos | Sigue el orden de esta guía |
 
@@ -122,8 +126,9 @@ publica hasta que el validador lo aprueba.
 ## Mapa mental final
 
 - `langgraph/` enseña el diseño paso a paso.
-- `app/` es el agente importable.
+- `app/` es el agente importable (`langfuse_chat.py` traza la TUI).
 - `ui/` separa la lógica que se puede pintar y probar.
 - `observability/` añade visibilidad sin reescribir el agente.
+- `langgraph-agent/` es el quickstart oficial, aislado del grafo de clase.
 - `tests/` comprueba contratos locales sin depender de servicios externos.
 - `docs/` explica las decisiones para que puedas reconstruir el sistema.
