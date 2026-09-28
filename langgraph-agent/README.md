@@ -2,12 +2,11 @@
 
 Calculator agent from the official [LangGraph Graph API quickstart](https://docs.langchain.com/oss/python/langgraph/quickstart). Isolated from the course `app/` graph.
 
-Client is always OpenRouter (`ChatOpenRouter`). Base URL, model, and upstream host come from the repo-root `.env`:
+Client is always OpenRouter (`ChatOpenRouter`). Base URL and model come from the repo-root `.env`. The client uses `reasoning.effort` `none` and `service_tier` `priority` (fast mode):
 
 ```
 OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
-OPENROUTER_MODEL=google/gemma-4-31b-it
-OPENROUTER_PROVIDER=Cerebras
+OPENROUTER_MODEL=openai/gpt-6-luna
 ```
 
 ## Setup
@@ -19,7 +18,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Put `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, `OPENROUTER_MODEL`, and `OPENROUTER_PROVIDER` in the repo-root `.env`.
+Put `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, and `OPENROUTER_MODEL` in the repo-root `.env`.
 
 Tracing uses Langfuse v4 (`CallbackHandler` + `propagate_attributes`). Also set `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, and `LANGFUSE_BASE_URL` in that same `.env`. LangSmith stays off for this demo.
 

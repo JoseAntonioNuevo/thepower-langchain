@@ -37,7 +37,7 @@ from ui.chat_tui import (
 def _app(**extra):
     """Monta la TUI con signals por defecto; extra pisa lo que el test quiera fijar."""
     defaults = dict(
-        modelo="google/gemma-4-31b-it",
+        modelo="openai/gpt-6-luna",
         thread_id="usuario_123",
         lines=Signal([], name="lines"),
         busy=Signal(False, name="busy"),
@@ -59,10 +59,10 @@ class TestChatTuiLayout(unittest.TestCase):
         frame = asyncio.run(self._capture())
         for trozo in (
             "LangGraph",
-            "gemma-4-31b-it",
+            "gpt-6-luna",
             "usuario_123",
             "LLM",
-            "Gemma",
+            "Luna",
             "tools",
             "START",
             "END",
@@ -374,6 +374,7 @@ class TestChatTuiLayout(unittest.TestCase):
     def test_nombre_modelo_corto(self):
         self.assertEqual(_nombre_modelo("google/gemma-4-31b-it"), "Gemma 4 31B")
         self.assertEqual(_nombre_modelo("gemma-4-31b-it"), "Gemma 4 31B")
+        self.assertEqual(_nombre_modelo("openai/gpt-6-luna"), "Gpt 6 Luna")
 
     def test_spinner_y_espina(self):
         self.assertEqual(_frame_spinner(0), "⠋")

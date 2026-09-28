@@ -112,16 +112,12 @@ Separar estas cuatro piezas permite ver el protocolo, no solo el texto final.
 
 ## Modelo y proveedor
 
-El código usa `ChatOpenRouter` con el modelo
-`google/gemma-4-31b-it`, `temperature=0` y:
+El código usa `ChatOpenRouter` con `openai/gpt-6-luna`, `temperature=0`,
+`reasoning.effort` `none` y `service_tier` `priority`.
 
-```python
-openrouter_provider={"order": ["Cerebras"]}
-```
-
-`order` pone Cerebras primero, pero permite que OpenRouter pruebe otro
-proveedor si el primero devuelve un error como `429`. No se usa `only`, porque
-eso convertiría el proveedor en un punto único de fallo de la demo.
+`none` no es una preferencia de estilo: en Chat Completions, GPT-6 Luna solo
+acepta function calling con ese effort. `priority` es el modo rápido. En este
+cliente el alias `fast` no se aplica y la respuesta vuelve como `default`.
 
 El interruptor `DEMO_FORCE_TOOL_ERROR=1` hace que el mock lance un
 `TimeoutError`. Sirve para practicar observabilidad sin tocar una API real.

@@ -49,16 +49,20 @@ MODELO = os.environ.get("OPENROUTER_MODEL", "").strip()
 if not MODELO:
     raise SystemExit(
         "Falta OPENROUTER_MODEL en el .env de la raíz "
-        "(p. ej. google/gemma-4-31b-it)."
+        "(p. ej. openai/gpt-6-luna)."
     )
 
 BASE_URL = _openrouter_base_url()
-# OpenRouter upstream, e.g. Cerebras. Same pattern as langgraph/02_tools.py.
-UPSTREAM = os.environ.get("OPENROUTER_PROVIDER", "").strip()
-model_kwargs: dict = {"model": MODELO, "base_url": BASE_URL, "temperature": 0}
-if UPSTREAM:
-    model_kwargs["openrouter_provider"] = {"order": [UPSTREAM]}
-# Client is always OpenRouter. Base URL, model, and upstream come from .env.
+# Mismo contrato que la clase: tools solo con effort none.
+# "priority" es el modo rápido; el alias "fast" en este cliente vuelve como default.
+model_kwargs: dict = {
+    "model": MODELO,
+    "base_url": BASE_URL,
+    "temperature": 0,
+    "reasoning": {"effort": "none"},
+    "model_kwargs": {"service_tier": "priority"},
+}
+# Client is always OpenRouter. Base URL and model come from .env.
 model = ChatOpenRouter(**model_kwargs)
 
 

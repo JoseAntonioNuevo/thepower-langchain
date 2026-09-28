@@ -37,15 +37,16 @@ from langgraph.prebuilt import ToolNode, tools_condition
 load_dotenv()
 
 
-# OpenRouter; Cerebras primero, otro proveedor si hay 429.
-MODELO = "google/gemma-4-31b-it"
+# GPT-6 Luna. Chat Completions solo admite tools con reasoning.effort "none".
+# service_tier "priority" es el modo rápido. El alias "fast" vuelve como default.
+MODELO = "openai/gpt-6-luna"
 
 # temperature=0: respuestas más deterministas (útil para demos de clase).
-# openrouter_provider.order: prueba Cerebras primero; si falla/429, otro proveedor.
 model = ChatOpenRouter(
     model=MODELO,
     temperature=0,
-    openrouter_provider={"order": ["Cerebras"]},
+    reasoning={"effort": "none"},
+    model_kwargs={"service_tier": "priority"},
 )
 
 

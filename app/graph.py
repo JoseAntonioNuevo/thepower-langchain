@@ -16,7 +16,7 @@ from langchain.tools import tool
 # AnyMessage: tipo del historial (human, ai, tool, …).
 from langchain_core.messages import AIMessage, AnyMessage, HumanMessage, SystemMessage
 
-# Cliente del modelo vía OpenRouter (Cerebras primero).
+# Cliente del modelo vía OpenRouter.
 from langchain_openrouter import ChatOpenRouter
 
 # InMemorySaver: memoria de conversación en RAM, claveada por thread_id.
@@ -43,15 +43,14 @@ from app.validador import (
 
 load_dotenv()
 
-# OpenRouter; Cerebras primero, otro proveedor si hay 429.
-MODELO = "google/gemma-4-31b-it"
-# reasoning.effort="low": pide un poco de "pensamiento" al modelo (si el
-# proveedor lo expone) para poder mostrarlo en la TUI sin alargar mucho.
+# GPT-6 Luna. En Chat Completions las tools solo funcionan con effort "none".
+# service_tier "priority" es el modo rápido. El alias "fast" vuelve como default.
+MODELO = "openai/gpt-6-luna"
 model = ChatOpenRouter(
     model=MODELO,
     temperature=0,
-    openrouter_provider={"order": ["Cerebras"]},
-    reasoning={"effort": "low"},
+    reasoning={"effort": "none"},
+    model_kwargs={"service_tier": "priority"},
 )
 
 # Un solo hilo para toda la sesión de terminal: así el bot recuerda turnos previos.

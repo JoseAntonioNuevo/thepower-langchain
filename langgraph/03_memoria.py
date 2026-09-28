@@ -1,8 +1,6 @@
 """03 — Memoria = checkpointer + thread_id, no el State. ~15 min."""
 
-# Pausa entre invokes: Cerebras limita ráfagas y 03 hace 3 llamadas seguidas.
 import sys
-import time
 from pathlib import Path
 
 # Ejecutar ``python langgraph/03_memoria.py`` debe encontrar ui desde la raíz.
@@ -35,12 +33,13 @@ from langgraph.graph import END, START, StateGraph, add_messages
 load_dotenv()
 
 
-# OpenRouter; Cerebras primero, otro proveedor si hay 429.
-MODELO = "google/gemma-4-31b-it"
+# Mismo modelo que 02 y 04: GPT-6 Luna, sin razonamiento, modo rápido.
+MODELO = "openai/gpt-6-luna"
 model = ChatOpenRouter(
     model=MODELO,
     temperature=0,
-    openrouter_provider={"order": ["Cerebras"]},
+    reasoning={"effort": "none"},
+    model_kwargs={"service_tier": "priority"},
 )
 
 
@@ -95,10 +94,6 @@ if __name__ == "__main__":
         )
     )
 
-    # Cerebras limita ráfagas; 03 hace 3 invokes seguidos.
-    with spinner("pausa anti-429 · 2s"):
-        time.sleep(2)
-
     # Turno 2: mismo thread_id. El modelo debería ver el saludo anterior y recordar Alex.
     with spinner("el modelo responde…"):
         r2 = graph.invoke(
@@ -112,9 +107,6 @@ if __name__ == "__main__":
             DATO,
         )
     )
-
-    with spinner("pausa anti-429 · 2s"):
-        time.sleep(2)
 
     # Turno 3: otro thread_id. No hay historial → no debería saber el nombre.
     with spinner("el modelo responde…"):

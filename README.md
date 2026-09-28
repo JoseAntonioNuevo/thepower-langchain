@@ -69,8 +69,7 @@ chat, commits ni trazas.
 |---|---|
 | `OPENROUTER_API_KEY` | Modelo en `02`–`04`, TUI, observabilidad y `langgraph-agent` ([keys](https://openrouter.ai/settings/keys)) |
 | `OPENROUTER_BASE_URL` | Por defecto `https://openrouter.ai/api/v1` |
-| `OPENROUTER_MODEL` | Por defecto `google/gemma-4-31b-it` |
-| `OPENROUTER_PROVIDER` | Upstream preferido (`Cerebras`; `order`, no `only`) |
+| `OPENROUTER_MODEL` | Por defecto `openai/gpt-6-luna` (lo leen el `.env` y `langgraph-agent`; 02–04 lo fijan en código) |
 | `TAVILY_API_KEY` | Hechos actuales en `buscar_web`. Sin ella `04` sigue y la tool avisa ([tavily.com](https://www.tavily.com)) |
 | `LANGSMITH_TRACING` | `true` → la TUI y LangGraph emiten a LangSmith solos |
 | `LANGSMITH_API_KEY` | Auth LangSmith |
@@ -97,7 +96,7 @@ tampoco van a LangSmith.
 | `langsmith` | Trazas de la TUI y de Clase 2 (`LANGSMITH_TRACING`) |
 | `langfuse` | Trazas v4: TUI (`app/langfuse_chat.py`), scripts `03`/`04` y `langgraph-agent` |
 
-Modelo: `google/gemma-4-31b-it` vía OpenRouter, Cerebras primero (`order`, no `only`). Si Cerebras da 429, OpenRouter usa otro proveedor. Espera unos segundos entre 02, 03 y 04.
+Modelo: `openai/gpt-6-luna` vía OpenRouter, `reasoning.effort` `none` (Chat Completions solo admite tools así) y `service_tier` `priority` (modo rápido; el alias `fast` en este cliente vuelve como `default`).
 
 ## Clase 1
 

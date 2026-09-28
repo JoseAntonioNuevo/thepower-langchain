@@ -272,7 +272,7 @@ def _nombre_amigable(nombre: str) -> str:
 
 
 def _nombre_modelo(slug: str) -> str:
-    """google/gemma-4-31b-it → Gemma 4 31B. Cabe en el nodo de 22 columnas."""
+    """openai/gpt-6-luna → Gpt 6 Luna. Cabe en el nodo de 22 columnas."""
     cola = (slug or "").rsplit("/", 1)[-1]
     if cola.endswith("-it"):
         cola = cola[:-3]
