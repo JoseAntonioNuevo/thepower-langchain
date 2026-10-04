@@ -1,3 +1,14 @@
+"""Pruebas locales del agente de soporte y de sus contratos de S5 y S6.
+
+FakeModel entrega respuestas preparadas y registra los mensajes que recibió,
+permitiendo forzar rutas y errores sin consumir APIs. call construye solicitudes
+de herramientas e invoke ejecuta un turno de prueba. SoporteTests comprueba
+respuestas, herramientas, límites, memoria, prompts y filtrado. ExperimentTests
+comprueba la comparación y la configuración con servicios simulados;
+PrivacySerializationTests comprueba el filtrado de mensajes serializados.
+La persistencia se prueba con una SQLite temporal y un proceso separado.
+"""
+
 import json
 import os
 import subprocess
@@ -21,13 +32,16 @@ class FakeModel(BaseChatModel):
     responses: list = Field(default_factory=list)
     seen: list = Field(default_factory=list)
 
+    # Identifica el modelo simulado ante LangChain.
     @property
     def _llm_type(self):
         return "scripted-test"
 
+    # Acepta tools sin conexión; las respuestas están preparadas.
     def bind_tools(self, tools, **kwargs):
         return self
 
+    # Registra mensajes y consume la siguiente respuesta o excepción simulada.
     def _generate(self, messages, stop=None, run_manager=None, **kwargs):
         self.seen.append(messages)
         msg = (
@@ -40,6 +54,7 @@ class FakeModel(BaseChatModel):
         return ChatResult(generations=[ChatGeneration(message=msg)])
 
 
+# Construye una solicitud de tool con nombre, argumentos e ID.
 def call(name="consultar_ticket", args=None, id="1"):
     return {
         "name": name,
@@ -49,6 +64,7 @@ def call(name="consultar_ticket", args=None, id="1"):
     }
 
 
+# Ejecuta un turno en un hilo conocido con dependencias inyectadas.
 def invoke(model, **kwargs):
     graph = build_graph(model, **kwargs)
     return graph.invoke(
@@ -58,11 +74,13 @@ def invoke(model, **kwargs):
 
 
 class SoporteTests(unittest.TestCase):
+    # Comprueba que una respuesta directa termina sin herramientas.
     def test_direct_response(self):
         r = invoke(FakeModel(responses=[AIMessage(content="Hola")]))
         self.assertEqual(r["tool_count"], 0)
         self.assertEqual(r["status"], "done")
 
+    # Comprueba las dos tools y sus resultados como ToolMessage.
     def test_both_tools_and_returns(self):
         m = FakeModel(
             responses=[
@@ -81,6 +99,7 @@ class SoporteTests(unittest.TestCase):
         self.assertEqual([c["ok"] for c in r["calls"]], [True, True])
         self.assertEqual(len([x for x in m.seen[-1] if isinstance(x, ToolMessage)]), 2)
 
+    # Argumento inválido, recurso ausente y fallo consumen un intento.
     def test_invalid_unknown_and_failure_count(self):
         for args, scenario in [
             ({"ticket_id": "bad"}, "normal"),
@@ -101,6 +120,7 @@ class SoporteTests(unittest.TestCase):
                 self.assertTrue(r["errors"])
                 self.assertFalse(r["calls"][0]["ok"])
 
+    # Solicita tres tools: ejecuta dos y responde también a la rechazada.
     def test_parallel_third_is_blocked(self):
         r = invoke(
             FakeModel(
@@ -118,6 +138,7 @@ class SoporteTests(unittest.TestCase):
             len([x for x in r["messages"] if isinstance(x, ToolMessage)]), 3
         )
 
+    # Fuerza tools en la respuesta final y comprueba que no se ejecutan.
     def test_final_model_cannot_execute_more_tools(self):
         r = invoke(
             FakeModel(
@@ -133,11 +154,13 @@ class SoporteTests(unittest.TestCase):
             len([x for x in r["messages"] if isinstance(x, ToolMessage)]), 3
         )
 
+    # Simula un fallo del modelo sin exponer su mensaje privado.
     def test_model_failure_controlled(self):
         r = invoke(FakeModel(responses=[RuntimeError("private-provider-response")]))
         self.assertEqual(r["status"], "model_error")
         self.assertNotIn("private-provider", str(r))
 
+    # Comprueba contador reiniciado en A e historial independiente en B.
     def test_counters_reset_and_threads_isolated(self):
         from langgraph.checkpoint.memory import InMemorySaver
 
@@ -149,8 +172,10 @@ class SoporteTests(unittest.TestCase):
                 AIMessage(content="Otro"),
             ]
         )
+        from langchain_core.runnables import RunnableConfig
+
         g = build_graph(m, checkpointer=InMemorySaver())
-        cfg = {"configurable": {"thread_id": "A"}}
+        cfg: RunnableConfig = {"configurable": {"thread_id": "A"}}
         g.invoke({"messages": [HumanMessage("T-100")]}, cfg)
         r = g.invoke({"messages": [HumanMessage("Hola")]}, cfg)
         self.assertEqual(r["tool_count"], 0)
@@ -160,6 +185,7 @@ class SoporteTests(unittest.TestCase):
         )
         self.assertNotIn("T-100", str(m.seen[-1]))
 
+    # Escribe desde otro proceso y recupera el estado desde SQLite.
     def test_sqlite_persists_across_processes(self):
         with tempfile.TemporaryDirectory() as d:
             db = str(Path(d) / "memory.sqlite")
@@ -180,11 +206,13 @@ class SoporteTests(unittest.TestCase):
                     g.get_state({"configurable": {"thread_id": "otro"}}).values
                 )
 
+    # Comprueba el SystemMessage que recibe el modelo.
     def test_prompt_really_used(self):
         m = FakeModel()
         invoke(m, prompt=prompt_template("INSTRUCCION_DISTINTA"))
         self.assertEqual(m.seen[0][0].content, "INSTRUCCION_DISTINTA")
 
+    # Filtra estructuras anidadas sin cambiar el original ni los tokens.
     def test_filter_recurses_without_mutating(self):
         original = {
             "input": {"messages": ["correo aula@example.test SECRET_DEMO_123"]},
@@ -197,12 +225,14 @@ class SoporteTests(unittest.TestCase):
         self.assertNotIn("SECRET_DEMO_123", str(filtered))
         self.assertEqual(filtered["input_tokens"], 12)
 
+    # Comprueba la prioridad de MODEL_ID sobre OPENROUTER_MODEL.
     def test_config_precedence(self):
         with patch.dict(
             os.environ, {"MODEL_ID": "model-first", "OPENROUTER_MODEL": "model-second"}
         ):
             self.assertEqual(settings().model_id, "model-first")
 
+    # Comprueba off sin trazas y métricas desconocidas en None.
     def test_off_does_not_export_and_missing_metrics_are_null(self):
         from app.soporte.runner import run_turn
         from app.soporte.telemetry import Telemetry
@@ -224,6 +254,7 @@ class SoporteTests(unittest.TestCase):
             self.assertIsNone(r["langfuse_trace_id"])
             t.close()
 
+    # Comprueba el vaciado de las colas incluso con una excepción.
     def test_flush_even_when_turn_raises(self):
         from app.soporte.telemetry import Telemetry
         from unittest.mock import Mock
@@ -237,6 +268,7 @@ class SoporteTests(unittest.TestCase):
                 raise RuntimeError()
         t.flush.assert_called_once()
 
+    # Comprueba el filtrado de atributos antes de exportar spans.
     def test_mask_exported_spans(self):
         from types import SimpleNamespace
         from app.soporte.privacy import mask_spans
@@ -261,6 +293,7 @@ if __name__ == "__main__":
 
 
 class ExperimentTests(unittest.TestCase):
+    # Comprueba diez casos por versión y veinte hilos independientes.
     def test_comparison_has_twenty_clean_threads(self):
         from app.soporte.evaluation import comparison_rows
         from app.soporte.config import ROOT
@@ -271,6 +304,7 @@ class ExperimentTests(unittest.TestCase):
         self.assertEqual(len({r[2] for r in rows}), 20)
         self.assertEqual([r[1] for r in rows[:10]], [r[1] for r in rows[10:]])
 
+    # Comprueba timeout y reintentos del cliente sin enviar consultas.
     def test_timeout_milliseconds_and_sdk_retries_disabled(self):
         from app.soporte.config import make_model, Settings
 
@@ -279,6 +313,7 @@ class ExperimentTests(unittest.TestCase):
         self.assertEqual(m.request_timeout, 45000)
         self.assertIsNone(m.client.sdk_configuration.retry_config)
 
+    # Simula los gestores, aplica el texto y rechaza versiones distintas.
     def test_remote_prompt_hash_and_application(self):
         from unittest.mock import Mock
         from types import SimpleNamespace
@@ -310,6 +345,7 @@ class ExperimentTests(unittest.TestCase):
 
 
 class PrivacySerializationTests(unittest.TestCase):
+    # Filtra al serializar sin modificar el mensaje Pydantic original.
     def test_pydantic_messages_are_filtered_before_serialization(self):
         message = HumanMessage("aula@example.test SECRET_DEMO_123")
         original = {"messages": [message]}

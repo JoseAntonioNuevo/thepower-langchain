@@ -1,4 +1,12 @@
-"""Ejecución observable y resultados de aula sin credenciales."""
+"""Ejecuta un turno del agente y prepara el resultado que enseñamos en clase.
+
+run_turn resuelve el prompt, abre SQLite si corresponde, construye el grafo y
+lo ejecuta con un HumanMessage y un thread_id. La observabilidad rodea ese turno
+sin construir otro agente. Después reúne respuesta, ruta, herramientas, errores,
+tokens y coste informado por el proveedor. Las métricas ausentes quedan en None.
+Al devolver el resultado aplica el filtrado de datos para su salida; esto no
+filtra automáticamente el historial SQLite ni lo enviado al proveedor.
+"""
 
 from contextlib import nullcontext
 import time
@@ -12,6 +20,7 @@ from .prompts import resolve_prompt
 from .privacy import redact
 
 
+# Ejecuta un turno: el grafo conserva el historial y reinicia las métricas del turno.
 def run_turn(
     *,
     model,
@@ -26,10 +35,13 @@ def run_turn(
     use_tools=True,
     query_id=None,
 ):
+    # 1. Aplicar el prompt y asignar un ID único a esta consulta.
     prompt, meta = resolve_prompt(version, source, telemetry)
     query_id = query_id or str(uuid.uuid4())
     started = time.perf_counter()
+    # 2. Mantener SQLite abierta durante la invocación; sin DB, el saver es None.
     with sqlite_memory(db) if db is not None else nullcontext(None) as saver:
+        # El escenario cambia las tools de prueba, no la estructura del agente.
         graph = build_graph(
             model,
             prompt=prompt,
@@ -37,6 +49,7 @@ def run_turn(
             tools=make_tools(scenario=scenario),
             use_tools=use_tools,
         )
+        # 3. Preparar hilo y callbacks; off conserva el hilo sin exportar trazas.
         with telemetry.turn(
             thread_id=thread_id,
             model_id=cfg.model_id,
@@ -44,9 +57,11 @@ def run_turn(
             scenario=scenario,
             query_id=query_id,
         ) as config:
+            # Solo aportamos el mensaje nuevo; el checkpointer recupera los anteriores.
             result = graph.invoke(
                 {"messages": [HumanMessage(content=question)]}, config
             )
+    # 4. Medir duración y sumar métricas solo si todas las llamadas las informan.
     duration = time.perf_counter() - started
     last = result["messages"][-1]
     usage = result["usage"]
@@ -58,6 +73,7 @@ def run_turn(
         for k in token_keys
     }
     costs = [u["cost_usd"] for u in usage]
+    # 5. Evidencia de este turno para la consola; no exportamos aquí todo el historial.
     record = {
         "query_id": query_id,
         "thread_id": thread_id,
@@ -86,6 +102,7 @@ def run_turn(
         "answer_present": bool(str(last.content).strip()),
         "quality": None,
     }
+    # answer_present mide existencia de texto, no calidad de la respuesta.
     if telemetry.lf and record["langfuse_trace_id"]:
         telemetry.lf.create_score(
             name="answer_present",
@@ -93,6 +110,7 @@ def run_turn(
             trace_id=record["langfuse_trace_id"],
         )
         telemetry.lf.flush()
+    # Exportar coste informado por el proveedor solo cuando se conoce.
     if record["cost_usd"] is not None:
         if telemetry.lf and record["langfuse_trace_id"]:
             telemetry.lf.create_score(
@@ -109,4 +127,5 @@ def run_turn(
                 comment="USD informados por OpenRouter; no tarifa inferida de la plataforma",
             )
         telemetry.flush()
+    # 6. Filtrar la copia devuelta; no modifica el estado interno ni lo enviado al modelo.
     return redact(record)

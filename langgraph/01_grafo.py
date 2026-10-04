@@ -1,4 +1,11 @@
-"""01 — Un grafo es funciones + aristas. ~12 min. Sin LLM, sin API key."""
+"""Primera etapa de S5: un grafo determinista, sin modelo ni claves de API.
+
+State define el texto compartido. mayusculas recibe ese estado y devuelve la
+actualización del texto. StateGraph registra el nodo y las conexiones de inicio
+y fin; compile prepara el grafo. Al ejecutar el archivo, invoke transforma
+«hola thepower» y los paneles muestran la entrada y el resultado.
+Sirve para entender estado, nodo y aristas antes de añadir un modelo.
+"""
 
 import sys
 from pathlib import Path

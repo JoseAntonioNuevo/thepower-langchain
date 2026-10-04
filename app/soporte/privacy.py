@@ -2,13 +2,14 @@
 
 import re
 from copy import deepcopy
+from typing import Any
 
 EMAIL = re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b")
 MARKER = re.compile(r"SECRET_DEMO_[A-Za-z0-9_-]+")
 SENSITIVE = re.compile(r"api[_-]?key|password|authorization|secret|token", re.I)
 
 
-def redact(data):
+def redact(data: Any) -> Any:
     # LangSmith recibe mensajes Pydantic antes de serializarlos al wire format.
     # Una copia del objeto sin recorrer sus campos dejaría el contenido intacto.
     if hasattr(data, "model_dump"):

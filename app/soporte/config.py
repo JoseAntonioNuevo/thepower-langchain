@@ -1,4 +1,12 @@
-"""Configuración explícita; la consola decide cuándo cargar el entorno."""
+"""Configuración del modelo y creación controlada del cliente de OpenRouter.
+
+Settings agrupa modelo, URL, timeout y límite de tokens. settings carga .env
+sin sobrescribir variables existentes y aplica MODEL_ID > OPENROUTER_MODEL >
+modelo predeterminado. make_model verifica la clave y crea el cliente cuando
+se solicita, sin imprimir credenciales. LazyModel conserva compatibilidad con
+las demos antiguas y retrasa la creación hasta invoke o stream.
+Importar este módulo no crea clientes ni realiza llamadas remotas.
+"""
 
 from dataclasses import dataclass
 import os
@@ -9,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_MODEL = "openai/gpt-6-luna"
 
 
+# Valores de configuración inmutables que se pueden inyectar en las pruebas.
 @dataclass(frozen=True)
 class Settings:
     model_id: str
@@ -17,6 +26,7 @@ class Settings:
     max_tokens: int = 600
 
 
+# Carga el entorno explícitamente y selecciona el modelo según la prioridad fijada.
 def settings() -> Settings:
     load_dotenv(ROOT / ".env", override=False)
     return Settings(
@@ -25,6 +35,7 @@ def settings() -> Settings:
     )
 
 
+# Crea el adaptador de LangChain y el SDK: todavía no envía una pregunta.
 def make_model(cfg: Settings):
     if not os.getenv("OPENROUTER_API_KEY"):
         raise ValueError(
@@ -40,6 +51,7 @@ def make_model(cfg: Settings):
         timeout_ms=int(cfg.timeout_s * 1000),
         retry_config=None,
     )
+    # Mismos parámetros para demos y comparaciones; sin reintentos automáticos.
     return ChatOpenRouter(
         model=cfg.model_id,
         base_url=cfg.base_url,
@@ -56,13 +68,16 @@ def make_model(cfg: Settings):
 class LazyModel:
     """Compatibilidad de demos antiguas: crear el cliente solo en invoke/stream."""
 
+    # Guarda las tools pendientes, sin construir todavía el cliente.
     def __init__(self, tools=None):
         self.tools = tools
         self._model = None
 
+    # Devuelve otra instancia diferida para no alterar la original.
     def bind_tools(self, tools):
         return LazyModel(tools)
 
+    # Construye y conserva el cliente en el primer uso; después lo reutiliza.
     def _get(self):
         if self._model is None:
             base = make_model(settings())
@@ -71,8 +86,10 @@ class LazyModel:
             )
         return self._model
 
+    # Ejecuta una consulta completa con el cliente obtenido de forma diferida.
     def invoke(self, *args, **kwargs):
         return self._get().invoke(*args, **kwargs)
 
+    # Delega la respuesta por streaming en ese mismo cliente.
     def stream(self, *args, **kwargs):
         return self._get().stream(*args, **kwargs)
