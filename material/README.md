@@ -26,9 +26,9 @@ LangGraph explica qué es, cómo se relaciona con LangChain y qué construiremos
 
 ## Recorrido
 
-Primero `langgraph/01_grafo.py`, después los ejemplos de soporte `05` a `08`. El miércoles se ejecutan `observability/01` a `06`, sobre el mismo núcleo `app/soporte`.
+El recorrido de S5 es `01_grafo.py` → `02_chatbot.py` → `03_herramientas.py` → `04_memoria.py` → `05_agente_completo.py`, todos en `langgraph/`. El miércoles se ejecutan `observability/01` a `06`, sobre el mismo núcleo `app/soporte`.
 
-Los ejemplos `05` a `08` se muestran en directo con `--tui`: chat interactivo y panel del recorrido, usando el entorno con `requirements-advanced.lock`. Los JSON quedan como respaldo y la consola sigue disponible sin `--tui`. Los ejemplos antiguos `02_tools`, `03_memoria` y `04_chatbot` conservan la demo original; `04` muestra el agente avanzado con juez y validador.
+Los ejemplos `02` a `05` se muestran en directo con `--tui`: chat interactivo y panel del recorrido, usando el entorno con `requirements-advanced.lock`. Los JSON quedan como respaldo y la consola sigue disponible sin `--tui`. Los ejemplos antiguos están separados en `langgraph/avanzado/` y conservan la demo original; `04` muestra el agente avanzado con juez y validador.
 
 ## QR
 

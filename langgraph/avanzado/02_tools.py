@@ -4,8 +4,8 @@ import os
 import sys
 from pathlib import Path
 
-# Ejecutar ``python langgraph/02_tools.py`` debe encontrar ui desde la raíz.
-_ROOT = Path(__file__).resolve().parents[1]
+# Ejecutar ``python langgraph/avanzado/02_tools.py`` debe encontrar ui desde la raíz.
+_ROOT = Path(__file__).resolve().parents[2]
 if str(_ROOT) not in sys.path:
     sys.path.append(str(_ROOT))
 

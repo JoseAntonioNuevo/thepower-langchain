@@ -130,7 +130,7 @@ arrancar una TUI ni llamar a internet para poder probarse.
 | Fichero | Se lee junto con |
 |---|---|
 | [`app/graph.py`](../../app/graph.py) | [`04_juez_validador.md`](04_juez_validador.md) |
-| [`langgraph/04_chatbot.py`](../../langgraph/04_chatbot.py) | Arranca `run_tui` |
+| [`langgraph/avanzado/04_chatbot.py`](../../langgraph/avanzado/04_chatbot.py) | Arranca `run_tui` |
 | [`ui/chat_tui.py`](../../ui/chat_tui.py) | [`tests/test_chat_tui.py`](../../tests/test_chat_tui.py) |
 | [`ui/chat_lines.py`](../../ui/chat_lines.py) | [`tests/test_chat_lines.py`](../../tests/test_chat_lines.py) |
 | [`ui/chat_input.py`](../../ui/chat_input.py) | [`tests/test_chat_input.py`](../../tests/test_chat_input.py) |

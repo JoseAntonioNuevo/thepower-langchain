@@ -1,5 +1,7 @@
 # Clase 1 — LangGraph (5 oct 2026)
 
+**Referencia del material original.** La clase actual sigue cinco ejemplos consecutivos en `langgraph/`, explicados en [el guion S5](../material/profesor/S5-guion.md). Los tres ejemplos originales de esta guía están ahora en `langgraph/avanzado/`; sus comandos y enlaces están actualizados.
+
 Grafo explícito → tools → memoria → chatbot. 90 min, thePower AI Engineer.
 
 El repo enseña LangGraph en cuatro scripts de `langgraph/`. El agente vive en
@@ -104,9 +106,9 @@ Desde la raíz:
 
 ```bash
 python langgraph/01_grafo.py     # sin clave
-python langgraph/02_tools.py
-python langgraph/03_memoria.py
-python langgraph/04_chatbot.py   # TUI; salir/q o Esc
+python langgraph/avanzado/02_tools.py
+python langgraph/avanzado/03_memoria.py
+python langgraph/avanzado/04_chatbot.py   # TUI; salir/q o Esc
 ```
 
 ### `01_grafo.py` — un grafo es funciones + aristas (~12 min)

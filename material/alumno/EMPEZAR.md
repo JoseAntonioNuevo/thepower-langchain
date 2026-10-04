@@ -30,10 +30,10 @@ Ejecuta cada etapa por separado en una terminal real o en la terminal integrada 
 
 ```bash
 python langgraph/01_grafo.py
-python langgraph/05_soporte_chatbot.py --tui
-python langgraph/06_soporte_tools.py --tui
-python langgraph/07_soporte_memoria.py --tui --hilo memoria-a --db data/mi-practica.sqlite
-python langgraph/08_soporte_completo.py --tui --hilo soporte-a --db data/mi-practica.sqlite
+python langgraph/02_chatbot.py --tui
+python langgraph/03_herramientas.py --tui
+python langgraph/04_memoria.py --tui --hilo memoria-a --db data/mi-practica.sqlite
+python langgraph/05_agente_completo.py --tui --hilo soporte-a --db data/mi-practica.sqlite
 ```
 
 En chatbot pregunta «Hola, ¿qué puedes hacer?». En tools prueba T-100, A-10 y T-999. En memoria escribe «Me llamo Alex», cierra, abre de nuevo con la misma DB e hilo y pregunta «¿Cómo me llamo?». Con otro hilo no debe conocer el nombre. En el agente completo pide T-100 y su artículo, y después haz una pregunta que dependa de lo anterior.
@@ -44,12 +44,12 @@ Sin SQLite, la TUI mantiene la conversación en RAM solo mientras está abierta.
 
 ```bash
 python langgraph/01_grafo.py
-python langgraph/05_soporte_chatbot.py --pregunta 'Hola, ¿qué puedes hacer?'
-python langgraph/06_soporte_tools.py --pregunta 'Consulta T-100.'
-python langgraph/07_soporte_memoria.py --hilo memoria-a --db data/mi-practica.sqlite --pregunta 'Me llamo Alex.'
-python langgraph/07_soporte_memoria.py --hilo memoria-a --db data/mi-practica.sqlite --pregunta '¿Cómo me llamo?'
-python langgraph/07_soporte_memoria.py --hilo memoria-b --db data/mi-practica.sqlite --pregunta '¿Cómo me llamo?'
-python langgraph/08_soporte_completo.py --hilo soporte-a --interactivo
+python langgraph/02_chatbot.py --pregunta 'Hola, ¿qué puedes hacer?'
+python langgraph/03_herramientas.py --pregunta 'Consulta T-100.'
+python langgraph/04_memoria.py --hilo memoria-a --db data/mi-practica.sqlite --pregunta 'Me llamo Alex.'
+python langgraph/04_memoria.py --hilo memoria-a --db data/mi-practica.sqlite --pregunta '¿Cómo me llamo?'
+python langgraph/04_memoria.py --hilo memoria-b --db data/mi-practica.sqlite --pregunta '¿Cómo me llamo?'
+python langgraph/05_agente_completo.py --hilo soporte-a --interactivo
 ```
 
 Los tres comandos de memoria arrancan procesos distintos. `memoria-a` debe recordar; `memoria-b` no debe conocer el nombre. Para una demostración limpia usa otro nombre de fichero o hilo; no necesitas borrar bases de datos.

@@ -49,7 +49,7 @@ python scripts/preflight.py
 Haz una comprobación real previa con un hilo propio:
 
 ```bash
-python langgraph/08_soporte_completo.py \
+python langgraph/05_agente_completo.py \
   --observabilidad both --prompts remote --version v2 \
   --hilo "$S6_DEMO-comprobacion" \
   --pregunta 'Consulta el ticket T-100.' \
@@ -220,7 +220,7 @@ Abre [prompts-remotos.json](/Users/jose/Documents/the-power/1-langGraph/material
 ### Demostrar que se aplica el prompt remoto · unos 4 minutos
 
 ```bash
-python langgraph/08_soporte_completo.py \
+python langgraph/05_agente_completo.py \
   --observabilidad both --prompts remote --version v2 \
   --hilo "$S6_DEMO-remoto" \
   --pregunta 'Consulta el ticket T-100.' \

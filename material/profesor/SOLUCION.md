@@ -50,7 +50,7 @@ S5: estado versus persistencia, herramientas versus texto generado, aislamiento 
 
 ## Solución avanzada
 
-El grafo con juez/validador está en `app/graph.py` y la TUI se abre con `langgraph/04_chatbot.py`. Sus ejemplos antiguos siguen disponibles. Los scripts de observabilidad originales se conservan como referencia histórica de código en `observabilidad-avanzada-original/`; no son puntos de entrada ejecutables desde esa carpeta. El recorrido recomendado para S6 es el de `observability/` en la raíz.
+El grafo con juez/validador está en `app/graph.py` y la TUI se abre con `langgraph/avanzado/04_chatbot.py`. Sus ejemplos antiguos siguen disponibles. Los scripts de observabilidad originales se conservan como referencia histórica de código en `observabilidad-avanzada-original/`; no son puntos de entrada ejecutables desde esa carpeta. El recorrido recomendado para S6 es el de `observability/` en la raíz.
 
 ## Coste del proveedor frente a estimación del panel
 

@@ -24,16 +24,16 @@ def main():
         (
             "chatbot",
             [
-                "langgraph/05_soporte_chatbot.py",
+                "langgraph/02_chatbot.py",
                 "--pregunta",
                 "Hola, ¿qué puedes hacer?",
             ],
         ),
-        ("tools", ["langgraph/06_soporte_tools.py", "--pregunta", "Consulta T-200."]),
+        ("tools", ["langgraph/03_herramientas.py", "--pregunta", "Consulta T-200."]),
         (
             "memoria-escribir",
             [
-                "langgraph/07_soporte_memoria.py",
+                "langgraph/04_memoria.py",
                 "--hilo",
                 batch + "-a",
                 "--db",
@@ -45,7 +45,7 @@ def main():
         (
             "memoria-leer",
             [
-                "langgraph/07_soporte_memoria.py",
+                "langgraph/04_memoria.py",
                 "--hilo",
                 batch + "-a",
                 "--db",
@@ -57,7 +57,7 @@ def main():
         (
             "memoria-aislar",
             [
-                "langgraph/07_soporte_memoria.py",
+                "langgraph/04_memoria.py",
                 "--hilo",
                 batch + "-b",
                 "--db",
@@ -69,7 +69,7 @@ def main():
         (
             "completo",
             [
-                "langgraph/08_soporte_completo.py",
+                "langgraph/05_agente_completo.py",
                 "--pregunta",
                 "Consulta T-100 y su artículo asociado.",
             ],

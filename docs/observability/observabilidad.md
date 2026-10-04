@@ -18,7 +18,7 @@ from app.graph import MODELO, graph, thread_id
 No hay un segundo chatbot ni una copia del ciclo. Si cambia
 [`app/graph.py`](../../app/graph.py), las demos de observabilidad ven ese cambio.
 
-La TUI de [`langgraph/04_chatbot.py`](../../langgraph/04_chatbot.py) también
+La TUI de [`langgraph/avanzado/04_chatbot.py`](../../langgraph/avanzado/04_chatbot.py) también
 emite: LangSmith si `LANGSMITH_TRACING=true`, Langfuse (un trace
 `handle-chat-turn` por turno, sesión `usuario_123`) vía
 [`app/langfuse_chat.py`](../../app/langfuse_chat.py) si hay `LANGFUSE_*`.

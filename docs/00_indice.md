@@ -50,7 +50,9 @@ flowchart LR
 | [`tests/`](../tests/) | Tests unitarios y smoke tests | No llaman a OpenRouter ni a Tavily |
 | [`docs/`](./) | Explicaciones para alumnos | Sigue el orden de esta guía |
 
-`app/graph.py` es la fuente de verdad del agente. `langgraph/04_chatbot.py`
+Esta sección describe el agente avanzado. El recorrido principal de soporte, numerado del 01 al 05, está en [el guion S5](../material/profesor/S5-guion.md).
+
+`app/graph.py` es la fuente de verdad del agente avanzado. `langgraph/avanzado/04_chatbot.py`
 solo lanza la TUI. Si cambia el ciclo, las demos de clase 2 ven ese cambio.
 
 ## Por qué los scripts pueden importar `app` y `ui`

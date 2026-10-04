@@ -93,7 +93,7 @@ Failed to POST https://api.smith.langchain.com/runs/multipart
 
 `/sessions` daba `403` en US y `200` en EU. La clave no estaba mal: el
 host sí. Después de cambiar `LANGSMITH_ENDPOINT`, hay que **reiniciar** el
-proceso (`python langgraph/04_chatbot.py` o el script de observabilidad).
+proceso (`python langgraph/avanzado/04_chatbot.py` o el script de observabilidad).
 `load_dotenv()` no recarga un proceso que ya está en marcha.
 
 ## Qué viaja en cada traza
@@ -133,7 +133,7 @@ demo lo dice y sigue: no se inyecta en el grafo.
 4. En [smith.langchain.com](https://smith.langchain.com) (o la UI EU de tu
    cuenta) abre el proyecto `thepower-clase-2` y busca el árbol.
 
-La TUI de Clase 1 (`python langgraph/04_chatbot.py`) también traza si
+La TUI de Clase 1 (`python langgraph/avanzado/04_chatbot.py`) también traza si
 `LANGSMITH_TRACING=true` en el `.env`, porque `app/graph.py` carga esas
 variables. El script aislado `langgraph-agent/agent.py` las apaga a
 propósito: no forma parte de la clase.

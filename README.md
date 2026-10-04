@@ -26,10 +26,10 @@ Copia `.env.example` a `.env` solo si no existe y rellena las claves localmente.
 | Clase | Comando / carpeta | Qué demuestra |
 |---|---|---|
 | S5 etapa 1 | `python langgraph/01_grafo.py` | Grafo fijo sin modelo |
-| S5 etapa 2 | `python langgraph/05_soporte_chatbot.py --tui` | Mensajes y modelo |
-| S5 etapa 3 | `python langgraph/06_soporte_tools.py --tui` | Tools locales validadas |
-| S5 etapa 4 | `python langgraph/07_soporte_memoria.py --hilo demo --tui` | SQLite y continuidad |
-| S5 etapa 5 | `python langgraph/08_soporte_completo.py --hilo demo --tui` | Agente completo con máximo dos tools |
+| S5 etapa 2 | `python langgraph/02_chatbot.py --tui` | Mensajes y modelo |
+| S5 etapa 3 | `python langgraph/03_herramientas.py --tui` | Tools locales validadas |
+| S5 etapa 4 | `python langgraph/04_memoria.py --hilo demo --tui` | SQLite y continuidad |
+| S5 etapa 5 | `python langgraph/05_agente_completo.py --hilo demo --tui` | Agente completo con máximo dos tools |
 | S6 | `observability/01` a `06` | Baseline, plataformas, incidente, comparación y privacidad |
 
 La TUI de soporte reutiliza el chat y teclado de la interfaz original, con un panel para los nodos reales del soporte. Sin SQLite conserva historial en RAM durante esa sesión; con SQLite continúa tras cerrar y abrir. `--salida` guarda el último resultado y todos los turnos en una carpeta de respaldo. Sin `--tui` siguen disponibles las ejecuciones de consola y `--interactivo`.
@@ -54,7 +54,7 @@ Los tests no consumen APIs. Las pruebas reales se ejecutan expresamente y quedan
 
 ## Ampliación original
 
-Se conserva el agente con juez, validador, búsqueda web y TUI. Arranque: `python langgraph/04_chatbot.py`, tras instalar el lock avanzado. Los ejemplos antiguos `02_tools.py` y `03_memoria.py` siguen disponibles, pero no sustituyen la memoria SQLite de la práctica.
+Se conserva el agente con juez, validador, búsqueda web y TUI. Arranque: `python langgraph/avanzado/04_chatbot.py`, tras instalar el lock avanzado. Los ejemplos antiguos `02_tools.py` y `03_memoria.py` siguen disponibles, pero no sustituyen la memoria SQLite de la práctica.
 
 La [guía avanzada original](docs/README-avanzado.md) conserva el contexto histórico de construcción; sus referencias al recorrido de observabilidad son anteriores a este paquete. [Documentación del agente avanzado](docs/00_indice.md).
 

@@ -4,7 +4,7 @@ El historial de mensajes ya existía en la lección 02. Aquí aprendemos a
 conservarlo entre varias llamadas a `graph.invoke()`.
 
 ```bash
-python langgraph/03_memoria.py
+python langgraph/avanzado/03_memoria.py
 ```
 
 Hace falta `OPENROUTER_API_KEY`. La demo hace tres llamadas consecutivas y
@@ -104,9 +104,9 @@ usuarios: cambia la configuración, no el código del nodo.
 
 | Fichero | Papel |
 |---|---|
-| [`langgraph/03_memoria.py`](../../langgraph/03_memoria.py) | Tres llamadas y dos hilos |
-| [`langgraph/02_tools.py`](../../langgraph/02_tools.py) | Punto de comparación sin memoria |
-| [`langgraph/04_chatbot.py`](../../langgraph/04_chatbot.py) | Arranca la TUI del chatbot completo |
+| [`langgraph/avanzado/03_memoria.py`](../../langgraph/avanzado/03_memoria.py) | Tres llamadas y dos hilos |
+| [`langgraph/avanzado/02_tools.py`](../../langgraph/avanzado/02_tools.py) | Punto de comparación sin memoria |
+| [`langgraph/avanzado/04_chatbot.py`](../../langgraph/avanzado/04_chatbot.py) | Arranca la TUI del chatbot completo |
 | [`app/graph.py`](../../app/graph.py) | Compila el grafo con `InMemorySaver` |
 
 En 04, la memoria convive con campos de control del turno. El documento

@@ -5,7 +5,7 @@ directamente: solicita una tool con nombre y argumentos, y LangGraph la
 ejecuta de forma controlada.
 
 ```bash
-python langgraph/02_tools.py
+python langgraph/avanzado/02_tools.py
 ```
 
 Hace falta `OPENROUTER_API_KEY`. La tool `buscar_clima` es un mock local, así
@@ -135,7 +135,7 @@ El interruptor `DEMO_FORCE_TOOL_ERROR=1` hace que el mock lance un
 
 | Fichero | Papel |
 |---|---|
-| [`langgraph/02_tools.py`](../../langgraph/02_tools.py) | Modelo, mock, nodo y ciclo de tools |
+| [`langgraph/avanzado/02_tools.py`](../../langgraph/avanzado/02_tools.py) | Modelo, mock, nodo y ciclo de tools |
 | [`app/fecha_hoy.py`](../../app/fecha_hoy.py) | En 04, una tool determinista adicional |
 | [`app/buscar_web.py`](../../app/buscar_web.py) | En 04, la tool real de Tavily |
 | [`tests/test_buscar_web.py`](../../tests/test_buscar_web.py) | Testea Tavily con `TavilyClient` mockeado |

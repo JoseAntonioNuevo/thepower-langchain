@@ -3,8 +3,8 @@
 import sys
 from pathlib import Path
 
-# python langgraph/04_chatbot.py pone langgraph/ en sys.path, no la raíz del repo.
-_ROOT = Path(__file__).resolve().parents[1]
+# python langgraph/avanzado/04_chatbot.py pone langgraph/ en sys.path, no la raíz del repo.
+_ROOT = Path(__file__).resolve().parents[2]
 if str(_ROOT) not in sys.path:
     sys.path.append(str(_ROOT))
 

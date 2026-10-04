@@ -15,7 +15,7 @@ Antes conviene leer [01 — grafo](01_grafo.md),
 Ejecuta siempre desde la raíz del repo:
 
 ```bash
-python langgraph/04_chatbot.py
+python langgraph/avanzado/04_chatbot.py
 ```
 
 Hace falta `OPENROUTER_API_KEY`. `TAVILY_API_KEY` hace falta para tiempo,
@@ -244,7 +244,7 @@ motivo, y la TUI encendería `▲ reintenta`.
 | Fichero | Rol |
 |---|---|
 | [`app/graph.py`](../../app/graph.py) | Monta el grafo (nodos + aristas). Se lee en clase. |
-| [`langgraph/04_chatbot.py`](../../langgraph/04_chatbot.py) | Arranca la TUI sobre ese `graph`. |
+| [`langgraph/avanzado/04_chatbot.py`](../../langgraph/avanzado/04_chatbot.py) | Arranca la TUI sobre ese `graph`. |
 | [`app/juez.py`](../../app/juez.py) | Consigna, parseo y rutas del juez. Sin red. |
 | [`app/validador.py`](../../app/validador.py) | Heurística, parseo y tope de reintentos. |
 | [`app/buscar_web.py`](../../app/buscar_web.py) | Cliente Tavily. |

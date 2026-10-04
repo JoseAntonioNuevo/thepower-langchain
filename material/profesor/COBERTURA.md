@@ -4,7 +4,7 @@ Los checks finales y sus fechas se registran en `../evidencias/VERIFICACION.md`.
 
 | Requisito | Ejemplo o implementación | Verificación |
 |---|---|---|
-| Grafo fijo y evolución | 01_grafo, 05–08_soporte | Grafo sin red + comandos de ensayo |
+| Grafo fijo y evolución | 01_grafo, 01–05 | Grafo sin red + comandos de ensayo |
 | Modelo configurable | app/soporte/config.py | Precedencia y preflight |
 | Dependencias bloqueadas | requirements-core/observability/advanced.lock | Instalación limpia |
 | Dos tools de soporte | datos/soporte y tools.py | Uso de cada tool y respuesta asociada |

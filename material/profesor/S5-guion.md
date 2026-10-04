@@ -5,6 +5,18 @@
 
 **La idea que debe quedar al terminar:** un agente tiene un recorrido explícito; el modelo puede pedir herramientas, Python controla su ejecución y un checkpointer conserva la conversación.
 
+## Los cinco ejemplos, en orden
+
+| Etapa | Archivo | Qué añade | Cómo lo pruebas |
+|---|---|---|---|
+| 01 | [01_grafo.py](/Users/jose/Documents/the-power/1-langGraph/langgraph/01_grafo.py) | Estado, función y aristas | Convierte texto a mayúsculas |
+| 02 | [02_chatbot.py](/Users/jose/Documents/the-power/1-langGraph/langgraph/02_chatbot.py) | Modelo y mensajes | Conversas en la TUI, sin tools |
+| 03 | [03_herramientas.py](/Users/jose/Documents/the-power/1-langGraph/langgraph/03_herramientas.py) | Dos herramientas y rutas | Consultas T-100, A-10 y T-999 en la TUI |
+| 04 | [04_memoria.py](/Users/jose/Documents/the-power/1-langGraph/langgraph/04_memoria.py) | SQLite y thread_id | Cierras y reabres; comparas dos hilos |
+| 05 | [05_agente_completo.py](/Users/jose/Documents/the-power/1-langGraph/langgraph/05_agente_completo.py) | Herramientas + memoria + límites | Consulta combinada, seguimiento y pruebas |
+
+Cada etapa tiene debajo su explicación, los archivos que mostrar, el comando completo, las preguntas para escribir y los resultados esperados. Los ejemplos originales de clima, memoria en RAM y juez/validador están en `langgraph/avanzado/`; no interrumpen este recorrido.
+
 ## Vista rápida: dónde debes estar a cada hora
 
 | Hora | Pantalla | Acción principal | Resultado que tienes que enseñar |
@@ -24,7 +36,7 @@
 
 ---
 
-## 0. Antes de empezar · 18:10–18:30
+## Preparación · Antes de empezar · 18:10–18:30
 
 ### Abre estas ventanas
 
@@ -55,12 +67,12 @@ Los lanzadores siguientes se ejecutan desde la terminal. Puedes abrirlos breveme
 | Etapa | Archivo que ejecutas | Código que explicas |
 |---|---|---|
 | Grafo fijo | `langgraph/01_grafo.py` | Estado, nodo y conexiones en ese mismo archivo |
-| Chatbot | `langgraph/05_soporte_chatbot.py` | `State`, `prompt_template` y `chatbot` en `app/soporte/graph.py` |
-| Herramientas | `langgraph/06_soporte_tools.py` | `app/soporte/tools.py`, `ejecutar_tools` y la conexión condicional en `app/soporte/graph.py` |
-| SQLite | `langgraph/07_soporte_memoria.py` | `app/soporte/persistence.py` y `compile(checkpointer=checkpointer)` |
-| Agente completo | `langgraph/08_soporte_completo.py` | El mismo grafo, con herramientas y persistencia habilitadas |
+| Chatbot | `langgraph/02_chatbot.py` | `State`, `prompt_template` y `chatbot` en `app/soporte/graph.py` |
+| Herramientas | `langgraph/03_herramientas.py` | `app/soporte/tools.py`, `ejecutar_tools` y la conexión condicional en `app/soporte/graph.py` |
+| SQLite | `langgraph/04_memoria.py` | `app/soporte/persistence.py` y `compile(checkpointer=checkpointer)` |
+| Agente completo | `langgraph/05_agente_completo.py` | El mismo grafo, con herramientas y persistencia habilitadas |
 
-**Para orientarte:** los ejemplos 05–08 son lanzadores de un mismo núcleo con distintas opciones. No son cuatro agentes independientes. Puedes decir: «Activamos una capacidad cada vez para entender qué aporta». El código principal de esta práctica está en `app/soporte/graph.py`; `app/graph.py` corresponde al agente avanzado.
+**Para orientarte:** los ejemplos 02–05 son lanzadores de un mismo núcleo con distintas opciones. No son cuatro agentes independientes. Puedes decir: «Activamos una capacidad cada vez para entender qué aporta». El código principal de esta práctica está en `app/soporte/graph.py`; `app/graph.py` corresponde al agente avanzado.
 
 **Código comentado para enseñar:** los archivos Python de la práctica incluyen una cabecera en español con su propósito y sus partes, y comentarios junto a las funciones y bloques principales. La descripción de los campos de los JSON está en [LEEME de los datos](/Users/jose/Documents/the-power/1-langGraph/datos/soporte/LEEME.md); los JSON conservan su formato válido.
 
@@ -86,7 +98,7 @@ Amplía el panel de terminal para dejar aproximadamente 110 columnas y 35 filas:
 **18:20 aproximadamente · Comando de comprobación, antes de compartir pantalla:**
 
 ```bash
-python langgraph/08_soporte_completo.py \
+python langgraph/05_agente_completo.py \
   --db "data/$S5_DEMO-comprobacion.sqlite" \
   --hilo "$S5_DEMO-comprobacion" \
   --pregunta 'Consulta el ticket T-100.' \
@@ -112,7 +124,7 @@ La redacción de `answer` puede variar. Comprueba los hechos y el recorrido; no 
 
 ---
 
-## 1. Introducción completa · 18:30–18:40 · presentación 1–8
+## Apertura · Introducción completa · 18:30–18:40 · presentación 1–8
 
 Este es el único bloque en el que usas el PowerPoint. Recorre las ocho diapositivas una vez. No ejecutes demos ni abras archivos de código durante estos diez minutos.
 
@@ -135,7 +147,7 @@ Este es el único bloque en el que usas el PowerPoint. Recorre las ocho diaposit
 
 ---
 
-## 2. De minúsculas a mayúsculas · 18:40–18:50
+## Etapa 1 · Grafo fijo: de minúsculas a mayúsculas · 18:40–18:50
 
 **Abre:** [01_grafo.py](/Users/jose/Documents/the-power/1-langGraph/langgraph/01_grafo.py).
 
@@ -175,13 +187,13 @@ Debe devolver `ESTAMOS APRENDIENDO LANGGRAPH`. Es el mismo grafo con otra entrad
 
 ---
 
-## 3. Añadir el chatbot · 18:50–19:05
+## Etapa 2 · Chatbot: añadir el modelo · 18:50–19:05
 
-**Abre primero:** [05_soporte_chatbot.py](/Users/jose/Documents/the-power/1-langGraph/langgraph/05_soporte_chatbot.py). Es un lanzador corto: no pases varios minutos explicando sus imports.
+**Abre primero:** [02_chatbot.py](/Users/jose/Documents/the-power/1-langGraph/langgraph/02_chatbot.py). Es un lanzador corto: no pases varios minutos explicando sus imports.
 
 **Después abre:** [graph.py del soporte](/Users/jose/Documents/the-power/1-langGraph/app/soporte/graph.py). Busca `prompt_template`, `MessagesPlaceholder` y la función `chatbot` dentro de `build_graph`.
 
-**Qué muestras ahora:** primero `State`, donde `messages` guarda el historial y `add_messages` incorpora mensajes nuevos. Después `prompt_template`, que combina instrucciones de sistema e historial, y `chatbot`, que llama al modelo y devuelve su mensaje. Las herramientas, el contador y las conexiones están en este mismo archivo, pero los explicarás en sus bloques. El lanzador 05 habilita esta etapa sin tools ni SQLite.
+**Qué muestras ahora:** primero `State`, donde `messages` guarda el historial y `add_messages` incorpora mensajes nuevos. Después `prompt_template`, que combina instrucciones de sistema e historial, y `chatbot`, que llama al modelo y devuelve su mensaje. Las herramientas, el contador y las conexiones están en este mismo archivo, pero los explicarás en sus bloques. El lanzador 02 habilita esta etapa sin tools ni SQLite.
 
 **Di:**
 
@@ -190,7 +202,7 @@ Debe devolver `ESTAMOS APRENDIENDO LANGGRAPH`. Es el mismo grafo con otra entrad
 **18:57 aproximadamente · Ejecuta el chatbot, después de explicar los mensajes y la llamada al modelo:**
 
 ```bash
-python langgraph/05_soporte_chatbot.py \
+python langgraph/02_chatbot.py \
   --tui --hilo "$S5_DEMO-chatbot" \
   --salida "resultados/$S5_DEMO/chatbot.json"
 ```
@@ -211,9 +223,9 @@ python langgraph/05_soporte_chatbot.py \
 
 ---
 
-## 4. Consultar datos mediante herramientas · 19:05–19:20
+## Etapa 3 · Herramientas: consultar tickets y artículos · 19:05–19:20
 
-### 4.1 Ticket existente · unos 6 minutos
+### Ticket existente · unos 6 minutos
 
 **Abre:** [tools.py](/Users/jose/Documents/the-power/1-langGraph/app/soporte/tools.py) y [tickets.json](/Users/jose/Documents/the-power/1-langGraph/datos/soporte/tickets.json).
 
@@ -228,7 +240,7 @@ Señala el argumento validado, el nombre de la función y los datos ficticios de
 **19:08 aproximadamente · Ejecuta la consulta del ticket, después de enseñar T-100 y su herramienta:**
 
 ```bash
-python langgraph/06_soporte_tools.py \
+python langgraph/03_herramientas.py \
   --tui --hilo "$S5_DEMO-tools" \
   --salida "resultados/$S5_DEMO/tools.json"
 ```
@@ -243,7 +255,7 @@ python langgraph/06_soporte_tools.py \
 
 **Señala también, dentro de esos dos minutos:** `model.bind_tools` ofrece las herramientas al modelo; `ejecutar_tools` ejecuta la solicitud; `ToolMessage` asocia el resultado con su `tool_call_id`. Termina mostrando las conexiones al final del archivo. No leas toda la función de arriba abajo.
 
-### 4.2 Artículo · unos 3 minutos
+### Artículo · unos 3 minutos
 
 Abre [articulos.json](/Users/jose/Documents/the-power/1-langGraph/datos/soporte/articulos.json).
 
@@ -257,7 +269,7 @@ Abre [articulos.json](/Users/jose/Documents/the-power/1-langGraph/datos/soporte/
 
 **Di:** «La descripción de la herramienta ayuda al modelo a elegirla. Su esquema ayuda a nuestro código a validar la petición.»
 
-### 4.3 Ticket inexistente · unos 4 minutos
+### Ticket inexistente · unos 4 minutos
 
 **Pantalla:** deja `tickets.json` visible para comprobar que T-999 no existe. Después de ejecutar, muestra `lookup` en `tools.py`: `data.get(key)` no encuentra el recurso y devuelve `ok: false` y `error: "no_encontrado"`. Así explicas de dónde sale el error controlado.
 
@@ -277,7 +289,7 @@ Abre [articulos.json](/Users/jose/Documents/the-power/1-langGraph/datos/soporte/
 
 ---
 
-## 5. Memoria persistente y dos hilos · 19:20–19:35
+## Etapa 4 · Memoria: persistencia y dos hilos · 19:20–19:35
 
 **Abre:** [persistence.py](/Users/jose/Documents/the-power/1-langGraph/app/soporte/persistence.py). Enseña el fichero SQLite y el bloque `with`. Luego señala `checkpointer` al compilar el grafo.
 
@@ -292,7 +304,7 @@ Abre [articulos.json](/Users/jose/Documents/the-power/1-langGraph/datos/soporte/
 **Ejecuta este primer proceso, después de enseñar el checkpointer:**
 
 ```bash
-python langgraph/07_soporte_memoria.py \
+python langgraph/04_memoria.py \
   --db "data/$S5_DEMO.sqlite" \
   --hilo conversacion-a \
   --tui \
@@ -308,7 +320,7 @@ python langgraph/07_soporte_memoria.py \
 **Ejecuta este segundo proceso cuando el anterior haya terminado. Conserva DB e hilo:**
 
 ```bash
-python langgraph/07_soporte_memoria.py \
+python langgraph/04_memoria.py \
   --db "data/$S5_DEMO.sqlite" \
   --hilo conversacion-a \
   --tui \
@@ -322,7 +334,7 @@ python langgraph/07_soporte_memoria.py \
 **Ejecuta este tercer proceso. Conserva la DB y cambia únicamente el hilo de conversación:**
 
 ```bash
-python langgraph/07_soporte_memoria.py \
+python langgraph/04_memoria.py \
   --db "data/$S5_DEMO.sqlite" \
   --hilo conversacion-b \
   --tui \
@@ -343,18 +355,18 @@ python langgraph/07_soporte_memoria.py \
 
 ---
 
-## 6. Completar el agente y demostrar el límite · 19:35–19:45
+## Etapa 5 · Agente completo: seguimiento y límites · 19:35–19:45
 
 **Reparto de este bloque:** 19:35–19:38 consulta completa; 19:38–19:40 seguimiento; 19:40–19:45 contador y pruebas. Si la API tarda, usa el respaldo y conserva la prueba del límite.
 
 ### Unir las dos herramientas · 19:35–19:38
 
-**Pantalla:** TUI para escribir, ver las herramientas y la respuesta y señalar el recorrido y el presupuesto. Si abres `08_soporte_completo.py`, basta señalar que activa herramientas y memoria en el mismo núcleo. Ten disponibles los dos JSON para comprobar la relación T-100 → A-10.
+**Pantalla:** TUI para escribir, ver las herramientas y la respuesta y señalar el recorrido y el presupuesto. Si abres `05_agente_completo.py`, basta señalar que activa herramientas y memoria en el mismo núcleo. Ten disponibles los dos JSON para comprobar la relación T-100 → A-10.
 
 **19:35 · Ejecuta el agente completo:**
 
 ```bash
-python langgraph/08_soporte_completo.py \
+python langgraph/05_agente_completo.py \
   --db "data/$S5_DEMO.sqlite" \
   --hilo soporte-completo \
   --tui \
@@ -414,7 +426,7 @@ PYTHONPATH=tests python -m unittest \
 
 ---
 
-## 7. Ejercicio y entrega · 19:45–19:50
+## Ejercicio y entrega · 19:45–19:50
 
 Abre [el enunciado S5](/Users/jose/Documents/the-power/1-langGraph/material/alumno/S5-enunciado.md). No necesitas ejecutar ningún comando para explicar la entrega.
 
@@ -435,14 +447,14 @@ Recorre esta lista, sin leer el enunciado entero:
 **19:47 · Ampliación opcional:** solo si ya has cubierto todo y sobra tiempo, ejecuta:
 
 ```bash
-python langgraph/04_chatbot.py
+python langgraph/avanzado/04_chatbot.py
 ```
 
 Explica en una frase el juez y validador. Sal con `Esc` y vuelve al enunciado. Si no sobra tiempo, omite este comando y conserva las preguntas de las 19:50.
 
 ---
 
-## 8. Preguntas y cierre · 19:50–20:00
+## Preguntas y cierre · 19:50–20:00
 
 **Terminal:** no hay comandos previstos. Vuelve al archivo correspondiente únicamente si ayuda a responder una pregunta.
 
