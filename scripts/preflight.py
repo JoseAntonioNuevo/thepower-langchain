@@ -39,6 +39,7 @@ def main():
         "langchain-openrouter",
         "langsmith",
         "langfuse",
+        "opentui",
     ]:
         try:
             info["dependencies"][name] = importlib.metadata.version(name)

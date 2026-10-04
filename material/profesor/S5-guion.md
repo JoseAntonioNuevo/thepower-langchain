@@ -20,7 +20,7 @@
 
 **Regla para el ritmo:** a las 19:20 entra en memoria aunque no hayas enseñado todo el código de tools. A las 19:45 pasa al ejercicio. La TUI avanzada es opcional y se omite si no sobra tiempo.
 
-**Cómo seguir los comandos:** cada bloque de terminal aparece junto a su explicación y lleva una hora orientativa. Primero muestra el código indicado, después copia y ejecuta el bloque completo y, por último, señala el resultado esperado. Ejecuta los comandos de uno en uno y espera a que vuelva el prompt antes del siguiente. Mantén la misma terminal y el mismo valor de `S5_DEMO` durante toda la práctica.
+**Cómo seguir los comandos:** desde la etapa de chatbot abrimos la TUI con `--tui` y escribimos las preguntas dentro del chat. Enter envía; Esc o «salir» cierra. Primero enseña el código, luego prueba la pregunta y señala el recorrido en el panel. Cambia de pestaña para explicar el código sin cerrar el chat; ciérralo solo al cambiar de etapa o para demostrar el reinicio. Mantén la misma terminal y el mismo valor de `S5_DEMO`. Los JSON se guardan como respaldo, no son la interfaz de la clase.
 
 ---
 
@@ -75,6 +75,10 @@ S5_DEMO="s5-$(date +%Y%m%d-%H%M%S)"
 python scripts/preflight.py
 ```
 
+**Entorno de la TUI:** utiliza el entorno actual con `opentui` instalado (lock avanzado). Si preparas un entorno nuevo, instala `requirements-advanced.lock` antes del directo. La TUI se abre en la terminal integrada de Cursor, no en la consola de depuración.
+
+Amplía el panel de terminal para dejar aproximadamente 110 columnas y 35 filas: podrás mostrar chat y recorrido juntos. El historial del chat permite desplazarse; el detalle completo de cada turno queda además en los archivos de respaldo.
+
 **Qué debe pasar:** aparece Python 3.12, el modelo efectivo y las dependencias. No deben faltar las de la práctica. Los valores secretos no aparecen; solo su estado de configuración. Este comando no llama al modelo.
 
 **Por qué usamos `S5_DEMO`:** crea un nombre nuevo para este ensayo. Así no mezclas la memoria con pruebas anteriores. Mantén esta terminal abierta y no vuelvas a ejecutar la asignación de `S5_DEMO` a mitad de la demostración de memoria.
@@ -91,9 +95,9 @@ python langgraph/08_soporte_completo.py \
 
 **Qué debe pasar:** respuesta sobre T-100, `tool_count` igual a 1 y `status: "done"`. Esta consulta sí consume API. Si falla, usa la tabla de incidencias del final; no actualices dependencias ni cambies de modelo durante el directo.
 
-### Cómo vas a leer las salidas
+### Cómo vas a mostrar los resultados
 
-Los ejemplos imprimen JSON. No leas todos los campos al alumno. Señala solo:
+La TUI muestra mensajes de usuario y asistente, solicitudes y resultados de herramientas, ruta, intentos y errores. Señala esos elementos en pantalla. Los campos siguientes quedan también en el JSON de respaldo; solo ábrelo si necesitas comprobar un detalle:
 
 | Campo | Cómo lo explicas |
 |---|---|
@@ -177,11 +181,13 @@ python langgraph/01_grafo.py
 
 ```bash
 python langgraph/05_soporte_chatbot.py \
-  --pregunta 'Hola, ¿qué puedes hacer?' \
+  --tui --hilo "$S5_DEMO-chatbot" \
   --salida "resultados/$S5_DEMO/chatbot.json"
 ```
 
-**Debe pasar:** responde en español; `tool_count` es 0 y `calls` está vacío. En `route` puede aparecer `respuesta_final`: en nuestro código significa una llamada sin herramientas. No es un nodo adicional ni un fallo.
+**Debe pasar:** aparece la respuesta en el chat, en español; el panel muestra cero intentos de herramientas. En `route` puede aparecer `respuesta_final`: en nuestro código significa una llamada sin herramientas. No es un nodo adicional ni un fallo.
+
+**Escribe en la TUI:** `Hola, ¿qué puedes hacer?` y pulsa Enter. Antes de cambiar a herramientas, sal con Esc. El historial de esta etapa está en RAM: continúa mientras está abierta, pero se pierde al salir.
 
 **Aclaración útil:** el prompt menciona soporte, pero en esta etapa no hemos habilitado sus funciones. Que un modelo diga que puede consultar algo no demuestra que lo haya hecho. La evidencia sería una ejecución de herramienta.
 
@@ -213,9 +219,11 @@ Señala el argumento validado, el nombre de la función y los datos ficticios de
 
 ```bash
 python langgraph/06_soporte_tools.py \
-  --pregunta 'Consulta el ticket T-100.' \
-  --salida "resultados/$S5_DEMO/ticket.json"
+  --tui --hilo "$S5_DEMO-tools" \
+  --salida "resultados/$S5_DEMO/tools.json"
 ```
+
+**Escribe en el chat:** `Consulta el ticket T-100.` y pulsa Enter. Mantén esta TUI abierta para las dos consultas siguientes.
 
 **Debe pasar:** T-100 está **en curso**, hay un error de acceso y no existe una fecha de resolución confirmada. `calls` muestra `consultar_ticket`, `executed: true`, `ok: true`; `tool_count` vale 1. La ruta habitual es `inicio → chatbot → tools → chatbot`.
 
@@ -233,11 +241,7 @@ Abre [articulos.json](/Users/jose/Documents/the-power/1-langGraph/datos/soporte/
 
 **19:13 aproximadamente · Ejecuta la consulta del artículo:**
 
-```bash
-python langgraph/06_soporte_tools.py \
-  --pregunta 'Consulta el artículo A-10.' \
-  --salida "resultados/$S5_DEMO/articulo.json"
-```
+**En la misma TUI, escribe:** `Consulta el artículo A-10.` y pulsa Enter. No ejecutes otro comando ni cierres el programa.
 
 **Debe pasar:** usa `buscar_articulo`; explica recuperar contraseña, revisar spam y no compartir la contraseña. No se envía ningún correo ni se modifica ninguna cuenta.
 
@@ -249,11 +253,7 @@ python langgraph/06_soporte_tools.py \
 
 **19:16 aproximadamente · Ejecuta la consulta del ticket inexistente:**
 
-```bash
-python langgraph/06_soporte_tools.py \
-  --pregunta 'Consulta el ticket T-999.' \
-  --salida "resultados/$S5_DEMO/no-encontrado.json"
-```
+**En la misma TUI, escribe:** `Consulta el ticket T-999.` y pulsa Enter. Mira el resultado de la herramienta y el error del panel. Al terminar este bloque, sal con Esc para abrir la etapa de SQLite.
 
 **Debe pasar:** indica que el ticket no existe y pide comprobar el identificador. La herramienta cuenta como un intento: `tool_count: 1`, `ok: false`, `errors` contiene `no_encontrado`.
 
@@ -285,11 +285,11 @@ python langgraph/06_soporte_tools.py \
 python langgraph/07_soporte_memoria.py \
   --db "data/$S5_DEMO.sqlite" \
   --hilo conversacion-a \
-  --pregunta 'Me llamo Alex.' \
+  --tui \
   --salida "resultados/$S5_DEMO/memoria-escribir.json"
 ```
 
-**Debe pasar:** reconoce el nombre. Espera a que vuelva el prompt de la terminal: el proceso ha terminado.
+**En la TUI escribe:** `Me llamo Alex.` y pulsa Enter. Debe reconocer el nombre. Espera a que termine la respuesta y sal con Esc: vuelve el prompt de la terminal y el proceso ha terminado.
 
 **Di:** «No hemos dejado el programa esperando: ya se ha cerrado. Ahora iniciamos otro proceso.»
 
@@ -301,11 +301,11 @@ python langgraph/07_soporte_memoria.py \
 python langgraph/07_soporte_memoria.py \
   --db "data/$S5_DEMO.sqlite" \
   --hilo conversacion-a \
-  --pregunta '¿Cómo me llamo?' \
+  --tui \
   --salida "resultados/$S5_DEMO/memoria-leer.json"
 ```
 
-**Debe pasar:** responde **Alex**. Mismo fichero y mismo hilo; proceso diferente.
+**En la nueva TUI escribe:** `¿Cómo me llamo?` y pulsa Enter. Debe responder **Alex**: mismo fichero y mismo hilo, proceso diferente. La pantalla empieza sin los globos anteriores, pero el agente recupera el historial de SQLite. Después de responder, sal con Esc.
 
 ### Paso C · 19:31 aproximadamente: demostrar aislamiento
 
@@ -315,11 +315,11 @@ python langgraph/07_soporte_memoria.py \
 python langgraph/07_soporte_memoria.py \
   --db "data/$S5_DEMO.sqlite" \
   --hilo conversacion-b \
-  --pregunta '¿Cómo me llamo?' \
+  --tui \
   --salida "resultados/$S5_DEMO/memoria-aislada.json"
 ```
 
-**Debe pasar:** no sabe el nombre, porque esta conversación es nueva.
+**En esta TUI escribe:** `¿Cómo me llamo?` y pulsa Enter. No debe saber el nombre: esta conversación es nueva. Después sal con Esc.
 
 **Di:**
 
@@ -339,7 +339,7 @@ python langgraph/07_soporte_memoria.py \
 
 ### Unir las dos herramientas · 19:35–19:38
 
-**Pantalla:** terminal para ejecutar y revisar `calls`, `route` y `answer`. Si abres `08_soporte_completo.py`, basta señalar que activa herramientas y memoria en el mismo núcleo. Ten disponibles los dos JSON para comprobar la relación T-100 → A-10.
+**Pantalla:** TUI para escribir, ver las herramientas y la respuesta y señalar el recorrido y el presupuesto. Si abres `08_soporte_completo.py`, basta señalar que activa herramientas y memoria en el mismo núcleo. Ten disponibles los dos JSON para comprobar la relación T-100 → A-10.
 
 **19:35 · Ejecuta el agente completo:**
 
@@ -347,9 +347,11 @@ python langgraph/07_soporte_memoria.py \
 python langgraph/08_soporte_completo.py \
   --db "data/$S5_DEMO.sqlite" \
   --hilo soporte-completo \
-  --pregunta 'Consulta T-100 y explícame su artículo de ayuda asociado.' \
+  --tui \
   --salida "resultados/$S5_DEMO/completo.json"
 ```
+
+**Escribe en el chat:** `Consulta T-100 y explícame su artículo de ayuda asociado.` y pulsa Enter. Mantén la TUI abierta para el seguimiento.
 
 **Debe pasar:** consulta T-100, descubre A-10 y consulta ese artículo. La respuesta incluye el estado y la ayuda; `tool_count` es 2. Puede verse `respuesta_final` al agotarse el presupuesto de tools.
 
@@ -357,23 +359,21 @@ python langgraph/08_soporte_completo.py \
 
 ### Hacer una pregunta que dependa del turno anterior · 19:38–19:40
 
-**19:38 · Ejecuta el seguimiento:** espera a que termine el proceso anterior y usa **la misma DB y el mismo hilo**:
+**19:38 · Seguimiento en la misma TUI:** espera a que termine la respuesta anterior y escribe:
 
-```bash
-python langgraph/08_soporte_completo.py \
-  --db "data/$S5_DEMO.sqlite" \
-  --hilo soporte-completo \
-  --pregunta 'Vuelve a consultar el artículo que acabamos de leer y resúmelo en dos pasos.' \
-  --salida "resultados/$S5_DEMO/completo-seguimiento.json"
-```
+> Vuelve a consultar el artículo que acabamos de leer y resúmelo en dos pasos.
+
+Pulsa Enter. No hace falta ejecutar otro comando: la DB y el hilo siguen siendo los mismos.
 
 **Debe pasar:** identifica A-10 a partir del historial, vuelve a usar `buscar_articulo` y resume su ayuda. No hemos incluido el identificador en la pregunta nueva. Lo habitual es una herramienta en este turno; verifica `calls`, la fuente A-10 y un `tool_count` de como máximo 2, sin exigir una redacción idéntica.
 
 **Di:** «La memoria sirve para entender a qué artículo me refiero. La herramienta comprueba su contenido en este turno. El presupuesto se reinicia: haber usado dos herramientas antes no bloquea la conversación entera.»
 
-**Por qué:** compruebas una pregunta dependiente del turno anterior en el agente de soporte completo, además del ejemplo sencillo del nombre. Si pide el identificador o consulta otro artículo, muestra la discrepancia y revisa DB, hilo e historial; no lo presentes como una demostración correcta.
+**Por qué:** compruebas una pregunta dependiente del turno anterior en el chat de soporte completo, además del ejemplo sencillo del nombre. Si pide el identificador o consulta otro artículo, muestra la discrepancia y revisa DB, hilo e historial; no lo presentes como una demostración correcta.
 
 ### Comprobar el contador y la tercera llamada · 19:40–19:45
+
+**Sal de la TUI con Esc** cuando haya terminado el seguimiento. La terminal queda disponible para ejecutar los tests.
 
 **Cambio de archivo:** primero `graph.py`, para mostrar la regla; después `tests/test_soporte.py`, para mostrar cómo se comprueba. En `graph.py`, `inicio` reinicia los contadores, `ejecutar_tools` bloquea nuevas ejecuciones al llegar a dos y `chatbot` usa una llamada sin herramientas para la respuesta final. En los tests, señala la solicitud simulada de tres tools y las comprobaciones de `tool_count` y `executed`; después, la segunda prueba, que inicia otro turno y otro hilo.
 

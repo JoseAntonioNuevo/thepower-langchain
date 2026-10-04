@@ -4,6 +4,8 @@ main interpreta argumentos, carga configuración y prepara modelo y observabilid
 Cada pregunta pasa a run_turn; su resultado se imprime como JSON y, opcionalmente,
 se guarda en disco. El modo interactivo permite varios turnos hasta escribir
 «salir» o «q». Los lanzadores eligen si se habilitan herramientas y memoria.
+Con --tui se abre el chat visual reutilizado de OpenTUI: mensajes, herramientas
+y recorrido en pantalla, con los JSON como respaldo si se proporciona --salida.
 El bloque finally cierra la observabilidad incluso si la ejecución falla.
 Los clientes se crean al ejecutar main, no al importar el archivo.
 """
@@ -38,6 +40,7 @@ def main(
     parser.add_argument("--prompts", choices=["local", "remote"], default="local")
     parser.add_argument("--salida", type=Path)
     parser.add_argument("--interactivo", action="store_true")
+    parser.add_argument("--tui", action="store_true", help="Chat visual interactivo de la etapa")
     args = parser.parse_args()
     # 2. Cargar entorno y crear los clientes solo después de interpretar argumentos.
     cfg = settings()
@@ -47,6 +50,15 @@ def main(
     telemetry = Telemetry.open(args.observabilidad)
     try:
         model = make_model(cfg)
+        if args.tui:
+            # Importación opcional: la práctica en consola no exige OpenTUI.
+            from ui.soporte_tui import run_support_tui
+
+            run_support_tui(
+                model=model, cfg=cfg, telemetry=telemetry, args=args,
+                use_tools=not chatbot_only, memory=memory,
+            )
+            return
         # 3. Un turno por consulta; en modo interactivo repetimos hasta salir.
         while True:
             question = (

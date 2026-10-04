@@ -1,0 +1,37 @@
+
+  LangGraph  fake  ·  hilo tui-test  ·  listo
+
+ ╭─chat──────────────────────────────────────────────────────────────────╮ ╭─recorrido──────────────────────╮
+ │                                                                       │ │                                │
+ │      Escribe una pregunta. Enter envía; Esc sale.                     │ │ Agente de soporte              │
+ │                                                                       │ │ START → inicio → chatbot       │
+ │                                              ╭───────────────tú─╮     │ │ chatbot → tools → chatbot      │
+ │                                              │                  │     │ │ chatbot → END                  │
+ │                                              │  Consulta T-100  │     │ │ SQLite · persiste al salir     │
+ │                                              │                  │     │ │ Nodo: done                     │
+ │                                              ╰──────────────────╯     │ │ Intentos tools: 1 / 2          │
+ │      │ tool                                                           │ │ Ruta: inicio → chatbot →       │
+ │        consultar_ticket(ticket_id='T-100')                            │ │ tools → chatbot                │
+ │                                                                       │ │ Errores: ninguno               │
+ │     ╭─dato · consultar_ticket──────────────────────────────────╮      │ │                                │
+ │     │                                                          │      │ │                                │
+ │     │  T-100 · estado: en curso · asunto: Error al acceder ·   │      │ │                                │
+ │     │  articulo: A-10 · actualizacion: Soporte está            │      │ │                                │
+ │     │  revisando el acceso. No hay fecha de resolución         │      │ │                                │
+ │     │                                                          │      │ │                                │
+ │     ╰──────────────────────────────────────────────────────────╯      │ │                                │
+ │                                                                       │ │                                │
+ │     ╭─bot──────────────────────────────────────────────────────╮      │ │                                │
+ │     │                                                          │      │ │                                │
+ │     │  T-100 está en curso                                     │      │ │                                │
+ │     │                                                          │      │ │                                │
+ │     ╰──────────────────────────────────────────────────────────╯      │ │                                │
+ │                                                                       │ │                                │
+ │                                                                       │ │                                │
+ │                                                                       │ │                                │
+ ╰───────────────────────────────────────────────────────────────────────╯ ╰────────────────────────────────╯
+
+ ╭─mensaje──────────────────────────────────────────────────────────────────────────────────────────────────╮
+ │  Escribe un mensaje…                                                                                     │
+ ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+  enter envía · shift+enter nueva línea · ↑ historial · esc sale                                     turno 1

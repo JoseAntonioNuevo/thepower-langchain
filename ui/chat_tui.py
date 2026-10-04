@@ -986,6 +986,7 @@ def build_app(
     juez_detalle: Signal | None = None,
     validador_detalle: Signal | None = None,
     turnos: Signal | None = None,
+    sidebar_factory: Callable[[], Box] | None = None,
 ) -> Box:
     """Árbol visual: header + (chat | grafo) + composer + pie."""
     pulso_sig = pulso if pulso is not None else Signal(0.0, name="pulso")
@@ -1106,7 +1107,7 @@ def build_app(
     )
     # Tests pasan grafo_opacity=1 (ya visible). En vivo arranca en 0 y hace fade-in.
     _arrancar_efectos(fase, pulso_sig, fade_sig, animar_fade=grafo_opacity is None, segundos=segundos)
-    sidebar = _panel_grafo(
+    sidebar = sidebar_factory() if sidebar_factory is not None else _panel_grafo(
         fase,
         active_tools,
         modelo=modelo,

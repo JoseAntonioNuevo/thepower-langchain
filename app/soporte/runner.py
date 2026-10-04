@@ -6,6 +6,8 @@ sin construir otro agente. Después reúne respuesta, ruta, herramientas, errore
 tokens y coste informado por el proveedor. Las métricas ausentes quedan en None.
 Al devolver el resultado aplica el filtrado de datos para su salida; esto no
 filtra automáticamente el historial SQLite ni lo enviado al proveedor.
+La TUI puede aportar memoria en RAM y un callback on_update: el grafo se ejecuta
+una sola vez en modo stream para mostrar sus pasos y obtener el resultado final.
 """
 
 from contextlib import nullcontext
@@ -34,13 +36,15 @@ def run_turn(
     scenario="normal",
     use_tools=True,
     query_id=None,
+    memory_saver=None,
+    on_update=None,
 ):
     # 1. Aplicar el prompt y asignar un ID único a esta consulta.
     prompt, meta = resolve_prompt(version, source, telemetry)
     query_id = query_id or str(uuid.uuid4())
     started = time.perf_counter()
     # 2. Mantener SQLite abierta durante la invocación; sin DB, el saver es None.
-    with sqlite_memory(db) if db is not None else nullcontext(None) as saver:
+    with sqlite_memory(db) if db is not None else nullcontext(memory_saver) as saver:
         # El escenario cambia las tools de prueba, no la estructura del agente.
         graph = build_graph(
             model,
@@ -58,9 +62,22 @@ def run_turn(
             query_id=query_id,
         ) as config:
             # Solo aportamos el mensaje nuevo; el checkpointer recupera los anteriores.
-            result = graph.invoke(
-                {"messages": [HumanMessage(content=question)]}, config
-            )
+            if on_update is None:
+                result = graph.invoke(
+                    {"messages": [HumanMessage(content=question)]}, config
+                )
+            else:
+                # Una sola ejecución: updates alimenta la TUI y values entrega
+                # el estado final, también cuando no hay un checkpointer SQLite.
+                for mode, payload in graph.stream(
+                    {"messages": [HumanMessage(content=question)]},
+                    config,
+                    stream_mode=["updates", "values"],
+                ):
+                    if mode == "updates":
+                        on_update(payload)
+                    elif mode == "values":
+                        result = payload
     # 4. Medir duración y sumar métricas solo si todas las llamadas las informan.
     duration = time.perf_counter() - started
     last = result["messages"][-1]

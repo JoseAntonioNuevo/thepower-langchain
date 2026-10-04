@@ -12,7 +12,7 @@ python -m pip install -r requirements-observability.lock
 
 En Windows la activación equivalente en PowerShell es `.venv\Scripts\Activate.ps1`. La verificación de este paquete se ha realizado en macOS; el arranque en Windows no se ha comprobado físicamente.
 
-Para la clase 1 basta `requirements-core.lock`. La ampliación con TUI usa `requirements-advanced.lock`. Los tres locks comparten versiones para evitar discrepancias.
+Para completar la práctica en consola basta `requirements-core.lock`. En el directo usamos la TUI: instala `requirements-advanced.lock` para seguirla con la misma interfaz. Los tres locks comparten versiones para evitar discrepancias.
 
 Copia `.env.example` a `.env` **solo si aún no tienes uno**. Rellena las variables en tu equipo. Nunca compartas ese archivo. `MODEL_ID` tiene prioridad sobre `OPENROUTER_MODEL`; si ambos están vacíos se utiliza el modelo predeterminado documentado por el preflight. Los parámetros actuales están probados para ese modelo, no para cualquier proveedor.
 
@@ -23,6 +23,24 @@ python scripts/preflight.py
 Este comando no llama a APIs. `--online` sí hace una consulta real e instrumenta ambas plataformas; necesita sus claves y puede consumir saldo.
 
 ## S5: cinco etapas
+
+### Recorrido interactivo del directo
+
+Ejecuta cada etapa por separado en una terminal real o en la terminal integrada de Cursor. Escribe la pregunta dentro del chat, pulsa Enter y espera la respuesta. Esc o «salir» cierra la interfaz. Usa una terminal amplia para ver chat y panel del recorrido.
+
+```bash
+python langgraph/01_grafo.py
+python langgraph/05_soporte_chatbot.py --tui
+python langgraph/06_soporte_tools.py --tui
+python langgraph/07_soporte_memoria.py --tui --hilo memoria-a --db data/mi-practica.sqlite
+python langgraph/08_soporte_completo.py --tui --hilo soporte-a --db data/mi-practica.sqlite
+```
+
+En chatbot pregunta «Hola, ¿qué puedes hacer?». En tools prueba T-100, A-10 y T-999. En memoria escribe «Me llamo Alex», cierra, abre de nuevo con la misma DB e hilo y pregunta «¿Cómo me llamo?». Con otro hilo no debe conocer el nombre. En el agente completo pide T-100 y su artículo, y después haz una pregunta que dependa de lo anterior.
+
+Sin SQLite, la TUI mantiene la conversación en RAM solo mientras está abierta. Con SQLite puede continuar tras salir. `--salida resultados/demo.json` guarda el último resultado y todos los turnos en `resultados/demo-turnos/`.
+
+### Alternativa en consola y comprobaciones reproducibles
 
 ```bash
 python langgraph/01_grafo.py
