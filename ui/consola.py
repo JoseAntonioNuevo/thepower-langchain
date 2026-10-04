@@ -10,6 +10,7 @@ from __future__ import annotations
 import os
 import sys
 import threading
+import textwrap
 from collections.abc import Iterable, Iterator
 from contextlib import contextmanager
 from typing import TextIO
@@ -45,9 +46,11 @@ def _paint(text: str, color: str, *, stream: TextIO | None = None) -> str:
     return f"\033[38;2;{red};{green};{blue}m{text}\033[0m"
 
 
-def banner(leccion: str, titulo: str, minutos: int) -> str:
+def banner(leccion: str, titulo: str, minutos: int | None = None) -> str:
     """Renderiza una cabecera de lección compacta y legible."""
-    texto = f"{leccion} · {titulo} · ~{minutos} min"
+    texto = f"{leccion} · {titulo}"
+    if minutos is not None:
+        texto += f" · ~{minutos} min"
     interior = f" {texto} "
     borde = "─" * len(interior)
     return "\n".join(
@@ -59,10 +62,16 @@ def banner(leccion: str, titulo: str, minutos: int) -> str:
     )
 
 
-def panel(titulo: str, cuerpo: str, color: str = BRIGHT) -> str:
+def panel(titulo: str, cuerpo: str, color: str = BRIGHT, *, width: int | None = None) -> str:
     """Renderiza un panel redondeado para estados, resultados o explicaciones."""
     lineas = cuerpo.splitlines() or [""]
-    ancho = max(len(titulo) + 2, *(len(linea) for linea in lineas))
+    if width is not None:
+        # Ancho exterior común para alinear paneles y envolver textos largos.
+        ancho = max(len(titulo) + 2, width - 4)
+        lineas = [parte for linea in lineas
+                  for parte in (textwrap.wrap(linea, width=ancho, replace_whitespace=False) or [""])]
+    else:
+        ancho = max(len(titulo) + 2, *(len(linea) for linea in lineas))
     hueco = max(1, ancho - len(titulo) - 1)
     top = f"╭─ {titulo} " + "─" * hueco + "╮"
     cuerpo_render = [f"│ {linea.ljust(ancho)} │" for linea in lineas]

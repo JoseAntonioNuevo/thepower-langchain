@@ -58,19 +58,16 @@ graph = builder.compile()
 # Solo corre si ejecutas este archivo (no si lo importas desde otro módulo).
 if __name__ == "__main__":
 
-    from ui.consola import BRIGHT, DATO, THINK, banner, grafo_ascii, panel
+    import argparse
+    from ui.grafo_demo import render_demo
+
+    # Mantener una entrada preparada y permitir cambiarla para probar otro texto.
+    parser = argparse.ArgumentParser(description="Transforma un texto mediante un grafo de un nodo")
+    parser.add_argument("--texto", default="hola thepower", help="Texto que recibe el grafo")
+    args = parser.parse_args()
 
     # invoke() recorre el grafo una vez con el estado inicial.
-    entrada = "hola thepower"
-    print(banner("01", "Un grafo es funciones + aristas", 12))
-    print(panel("grafo", grafo_ascii(["mayusculas"]), THINK))
+    entrada = args.texto
     resultado = graph.invoke({"texto": entrada})
-
-    print(
-        panel(
-            "estado",
-            f"antes   · {entrada}\ndespués · {resultado['texto']}",
-            DATO,
-        )
-    )
-    print(panel("salida Python", str(resultado), BRIGHT))
+    # La presentación queda separada de la lógica para enseñar el grafo con claridad.
+    print(render_demo(entrada, resultado))

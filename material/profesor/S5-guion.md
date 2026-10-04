@@ -135,7 +135,7 @@ Este es el único bloque en el que usas el PowerPoint. Recorre las ocho diaposit
 
 ---
 
-## 2. El grafo más pequeño · 18:40–18:50
+## 2. De minúsculas a mayúsculas · 18:40–18:50
 
 **Abre:** [01_grafo.py](/Users/jose/Documents/the-power/1-langGraph/langgraph/01_grafo.py).
 
@@ -154,6 +154,16 @@ python langgraph/01_grafo.py
 ```
 
 **Debe aparecer:** entrada `hola thepower`, salida `HOLA THEPOWER` y un recorrido con un nodo. No se utiliza ninguna API ni clave.
+
+**Cómo leer la pantalla:** empieza por «Transformación del texto» para comprobar el resultado; señala START → mayusculas → END; después relaciona los cuatro pasos de «Qué ha hecho y cómo» con `State`, `.upper()`, `add_edge` e `invoke` en el editor. «Estado final del grafo» muestra el diccionario que devuelve la ejecución. Refuerza la frase final: Python transforma el texto y LangGraph organiza el recorrido.
+
+**Si quieres probar otra entrada delante del alumno:**
+
+```bash
+python langgraph/01_grafo.py --texto 'Estamos aprendiendo LangGraph'
+```
+
+Debe devolver `ESTAMOS APRENDIENDO LANGGRAPH`. Es el mismo grafo con otra entrada, sin cambiar el código del nodo.
 
 **Por qué lo hacemos:** demuestra que LangGraph organiza una ejecución; no exige que todos los nodos contengan un modelo.
 
