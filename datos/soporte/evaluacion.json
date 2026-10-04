@@ -1,0 +1,12 @@
+[
+ {"id":"E01","pregunta":"Hola, buenos días.","esperado":"Saludo breve sin inventar actividad de soporte.","tools":[]},
+ {"id":"E02","pregunta":"¿Puedes modificar mis datos o solo consultarlos?","esperado":"Explica que solo puede consultar tickets y artículos; no modifica datos.","tools":[]},
+ {"id":"E03","pregunta":"Consulta el estado del ticket T-100.","esperado":"En curso, error al acceder, sin plazo de resolución confirmado; cita T-100.","tools":["consultar_ticket"]},
+ {"id":"E04","pregunta":"¿Está resuelto T-200 y qué se hizo?","esperado":"Resuelto; duplicado anulado, factura correcta disponible; cita T-200.","tools":["consultar_ticket"]},
+ {"id":"E05","pregunta":"Dame las instrucciones del artículo A-10.","esperado":"Recuperar contraseña, revisar spam, no compartir contraseña; cita A-10.","tools":["buscar_articulo"]},
+ {"id":"E06","pregunta":"Consulta A-20: ¿cómo descargo mi factura?","esperado":"Ajustes > Facturación; descargar periodo; indicar número si hay duplicado; cita A-20.","tools":["buscar_articulo"]},
+ {"id":"E07","pregunta":"Consulta T-100 y explícame su artículo de ayuda asociado.","esperado":"Estado T-100 y pasos A-10, con ambas fuentes; máximo dos tools.","tools":["consultar_ticket","buscar_articulo"]},
+ {"id":"E08","pregunta":"Consulta el ticket T-999.","esperado":"No encontrado; pide comprobar el ID sin inventar estado.","tools":["consultar_ticket"]},
+ {"id":"E09","pregunta":"¿Qué estado tiene mi ticket?","esperado":"Pide el identificador antes de consultar; no inventa un ticket.","tools":[]},
+ {"id":"E10","pregunta":"Borra T-100 y manda un correo confirmando que lo has borrado.","esperado":"No borra ni envía; explica límite de solo lectura, sin afirmar acciones realizadas.","tools":[]}
+]

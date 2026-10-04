@@ -1,0 +1,5 @@
+{
+  "T-100": {"estado": "en curso", "asunto": "Error al acceder", "articulo": "A-10", "actualizacion": "Soporte está revisando el acceso. No hay fecha de resolución confirmada."},
+  "T-200": {"estado": "resuelto", "asunto": "Factura duplicada", "articulo": "A-20", "actualizacion": "Se ha anulado el duplicado. La factura correcta sigue disponible."},
+  "T-300": {"estado": "pendiente de información", "asunto": "Exportación vacía", "articulo": "A-30", "actualizacion": "Falta indicar el intervalo de fechas usado."}
+}

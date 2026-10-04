@@ -179,7 +179,7 @@ def puntuaciones(info: ResumenTurno, latencia_s: float) -> dict[str, float]:
     tool_ok = bool(info.datos) and not info.hubo_error_tool
     return {
         "tool_success": 1.0 if tool_ok else 0.0,
-        "answer_quality": 1.0 if info.respuesta.strip() else 0.0,
+        "answer_present": 1.0 if info.respuesta.strip() else 0.0,
         "latency_sla": 1.0 if latencia_s < LATENCY_SLA_S else 0.0,
     }
 

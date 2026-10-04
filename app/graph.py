@@ -45,13 +45,10 @@ load_dotenv()
 
 # GPT-6 Luna. En Chat Completions las tools solo funcionan con effort "none".
 # service_tier "priority" es el modo rápido. El alias "fast" vuelve como default.
-MODELO = "openai/gpt-6-luna"
-model = ChatOpenRouter(
-    model=MODELO,
-    temperature=0,
-    reasoning={"effort": "none"},
-    model_kwargs={"service_tier": "priority"},
-)
+from app.soporte.config import LazyModel, settings
+
+MODELO = settings().model_id
+model = LazyModel()
 
 # Un solo hilo para toda la sesión de terminal: así el bot recuerda turnos previos.
 thread_id = "usuario_123"

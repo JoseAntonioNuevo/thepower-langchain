@@ -39,15 +39,10 @@ load_dotenv()
 
 # GPT-6 Luna. Chat Completions solo admite tools con reasoning.effort "none".
 # service_tier "priority" es el modo rápido. El alias "fast" vuelve como default.
-MODELO = "openai/gpt-6-luna"
+from app.soporte.config import LazyModel, settings
 
-# temperature=0: respuestas más deterministas (útil para demos de clase).
-model = ChatOpenRouter(
-    model=MODELO,
-    temperature=0,
-    reasoning={"effort": "none"},
-    model_kwargs={"service_tier": "priority"},
-)
+MODELO = settings().model_id
+model = LazyModel()
 
 
 # El docstring es lo que el modelo lee para saber CUÁNDO usar la tool.

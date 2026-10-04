@@ -1,0 +1,32 @@
+[
+  {
+    "query_id": "e382c4f6-9e5a-45ca-a01b-7379998a2e2a",
+    "provider_cost_usd": 5.08e-05,
+    "scores": [
+      {
+        "name": "provider_cost_usd",
+        "value": 5.08e-05
+      },
+      {
+        "name": "manual_quality",
+        "value": 1.0
+      }
+    ],
+    "private": true
+  },
+  {
+    "query_id": "0a865125-9c60-498c-9167-aa5106bdf8f6",
+    "provider_cost_usd": 8.22e-05,
+    "scores": [
+      {
+        "name": "manual_quality",
+        "value": 1.0
+      },
+      {
+        "name": "provider_cost_usd",
+        "value": 8.22e-05
+      }
+    ],
+    "private": true
+  }
+]

@@ -3,3 +3,11 @@
 __pycache__
 .langgraph_api
 sessions/
+
+.build/
+.venv-verificacion/
+data/
+resultados/
+
+# Copias locales de presentaciones anteriores
+version-previa-*/

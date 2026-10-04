@@ -34,13 +34,10 @@ load_dotenv()
 
 
 # Mismo modelo que 02 y 04: GPT-6 Luna, sin razonamiento, modo rápido.
-MODELO = "openai/gpt-6-luna"
-model = ChatOpenRouter(
-    model=MODELO,
-    temperature=0,
-    reasoning={"effort": "none"},
-    model_kwargs={"service_tier": "priority"},
-)
+from app.soporte.config import LazyModel, settings
+
+MODELO = settings().model_id
+model = LazyModel()
 
 
 # El State solo describe la forma de un turno. NO es la memoria a largo plazo:

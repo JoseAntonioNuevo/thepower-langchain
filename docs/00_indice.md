@@ -1,3 +1,5 @@
+> Actualización S5/S6: el recorrido principal está en [material/README.md](../material/README.md). Esta guía explica el agente avanzado original; los scripts actuales de observabilidad utilizan app/soporte.
+
 # Guía del repositorio
 
 Esta carpeta explica cómo está construido el repositorio de LangGraph y por qué

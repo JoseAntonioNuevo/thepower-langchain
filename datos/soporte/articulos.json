@@ -1,0 +1,5 @@
+{
+  "A-10": {"titulo": "Recuperar acceso", "texto": "Usa Recuperar contraseña en la pantalla de acceso. Revisa también la carpeta de spam. No compartas tu contraseña con soporte."},
+  "A-20": {"titulo": "Consultar facturas", "texto": "Entra en Ajustes > Facturación y descarga la factura del periodo. Si ves un duplicado, indica el número de factura a soporte."},
+  "A-30": {"titulo": "Exportar tareas", "texto": "Selecciona un intervalo de fechas con tareas, elimina filtros innecesarios y pulsa Exportar CSV."}
+}

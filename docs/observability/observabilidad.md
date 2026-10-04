@@ -1,3 +1,5 @@
+> Referencia histórica de la demo avanzada. Para los scripts actuales, usar [la guía S6](../../material/profesor/S6-guion.md) y [el núcleo compartido de soporte](../../material/profesor/SOLUCION.md).
+
 # Clase 2 — Observabilidad sobre el mismo grafo
 
 Instrumentar el grafo del 5 oct para depurar, evaluar y mejorar con datos reales.
