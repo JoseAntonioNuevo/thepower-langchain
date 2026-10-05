@@ -1,12 +1,10 @@
 # S5 y S6 · LangGraph y observabilidad
 
-Paquete docente para **5 y 7 de octubre de 2026, 18:30–20:00 (Madrid)**.
+Código de las sesiones del 5 y 7 de octubre de 2026, 18:30–20:00 (Madrid). Ambas reutilizan el soporte de `app/soporte`.
 
-**[Abrir materiales, guiones, presentaciones y evidencias](material/README.md)**
+## Instalación
 
-## Instalación y comprobación
-
-Python 3.12. Desde la raíz del repositorio:
+Python 3.12, desde la raíz:
 
 ```bash
 python3.12 -m venv .venv
@@ -15,49 +13,44 @@ python -m pip install -r requirements-advanced.lock
 python scripts/preflight.py
 ```
 
-Copia `.env.example` a `.env` solo si no existe y rellena las claves localmente. `MODEL_ID` tiene prioridad sobre `OPENROUTER_MODEL`. No compartas ni versiones `.env`. El preflight normal no usa red; `--online` sí consume una consulta real y comprueba las dos integraciones.
+Configura `.env` a partir de `.env.example` solo si no existe. `MODEL_ID` tiene prioridad sobre `OPENROUTER_MODEL`. No compartas ni versiones credenciales. El preflight normal informa de dependencias y configuración; `--online` consume una consulta real. La recepción de trazas se verifica por separado.
 
-- `requirements-core.lock`: S5, sin TUI.
-- `requirements-observability.lock`: S5 + S6.
-- `requirements-advanced.lock` / `requirements.txt`: todo, incluida la ampliación original.
+Locks: `requirements-core.lock` para S5 sin TUI; `requirements-observability.lock` para S5/S6 en consola; `requirements-advanced.lock` para todo, incluida la TUI.
 
-## Recorrido principal
+## Recorrido S5
 
-| Clase | Comando / carpeta | Qué demuestra |
+| Etapa | Comando | Capacidad |
 |---|---|---|
-| S5 etapa 1 | `python langgraph/01_grafo.py` | Grafo fijo sin modelo |
-| S5 etapa 2 | `python langgraph/02_chatbot.py --tui` | Mensajes y modelo |
-| S5 etapa 3 | `python langgraph/03_herramientas.py --tui` | Tools locales validadas |
-| S5 etapa 4 | `python langgraph/04_memoria.py --hilo demo --tui` | SQLite y continuidad |
-| S5 etapa 5 | `python langgraph/05_agente_completo.py --hilo demo --tui` | Agente completo con máximo dos tools |
-| S6 | `observability/01` a `06` | Baseline, plataformas, incidente, comparación y privacidad |
+| 01 | `python langgraph/01_grafo.py` | Grafo sin modelo |
+| 02 | `python langgraph/02_chatbot.py --tui` | Chat, sin tools; RAM de la sesión |
+| 03 | `python langgraph/03_herramientas.py --tui` | Tools de lectura; RAM de la sesión |
+| 04 | `python langgraph/04_memoria.py --tui --hilo demo` | SQLite, sin tools |
+| 05 | `python langgraph/05_agente_completo.py --tui --hilo demo` | Tools y SQLite |
 
-La TUI de soporte reutiliza el chat y teclado de la interfaz original, con un panel para los nodos reales del soporte. Sin SQLite conserva historial en RAM durante esa sesión; con SQLite continúa tras cerrar y abrir. `--salida` guarda el último resultado y todos los turnos en una carpeta de respaldo. Sin `--tui` siguen disponibles las ejecuciones de consola y `--interactivo`.
+Los ejemplos 02–05 aceptan `--observabilidad off|langsmith|langfuse|both`. El límite es de dos intentos de herramienta por turno; también cuentan los fallidos. Usar otra DB o un hilo nuevo para pruebas limpias. `--salida` permite guardar resultados; la TUI conserva además un archivo por turno. Sin TUI siguen disponibles consola y `--interactivo`.
 
-Comandos exactos, reinicio y errores: **[Empezar](material/alumno/EMPEZAR.md)**.
+## Recorrido S6
 
-## Arquitectura
+**[Guía técnica S6: mismos chatbots, trazas, prompts y evaluación](S6-README.md)**.
 
-`app/soporte` es el núcleo común de ambas clases. Modelo, prompt y checkpointer son inyectables. Los scripts de S6 lo instrumentan sin construir otro agente. Los datos de tickets/artículos son ficticios; todas las herramientas son de lectura.
+`observability/01` a `06` cubren referencia sin exportación, LangSmith, Langfuse, incidente, comparación y privacidad. Los lanzadores observan el núcleo de S5: no construyen otro agente. Los prompts remotos se registran en `data/prompts-remotos.json`; se conserva compatibilidad con el manifiesto local antiguo.
 
-`data/` contiene SQLite y `resultados/` las ejecuciones; ambos están ignorados. Usa otro fichero o hilo para una demo limpia. Los prompts remotos tienen versiones inmutables en un manifiesto propio; no se sobrescriben prompts ajenos.
+## Arquitectura y datos
+
+`app/soporte` separa grafo, herramientas, persistencia, ejecución, configuración, prompts, telemetría, privacidad y evaluación. Modelo, prompt y checkpointer se pueden inyectar para pruebas. Tickets y artículos son ficticios y de solo lectura. `data/` y `resultados/` quedan fuera de Git.
 
 ## Tests
 
 ```bash
 python -m unittest discover -s tests -p 'test_soporte.py'
-# Suite completa: requiere el lock avanzado
+python -m unittest discover -s tests -p 'test_s6*local.py'
 python -m unittest discover -s tests
 ```
 
-Los tests no consumen APIs. Las pruebas reales se ejecutan expresamente y quedan identificadas en material/evidencias.
+Las pruebas locales usan respuestas o servicios simulados. Una prueba local correcta no demuestra recepción en una plataforma remota. Antes del directo, comprobar una consulta real, el árbol y el masking en ambos servicios.
 
-## Ampliación original
+## Materiales y ampliación
 
-Se conserva el agente con juez, validador, búsqueda web y TUI. Arranque: `python langgraph/avanzado/04_chatbot.py`, tras instalar el lock avanzado. Los ejemplos antiguos `02_tools.py` y `03_memoria.py` siguen disponibles, pero no sustituyen la memoria SQLite de la práctica.
+Las presentaciones, notas de Obsidian, guiones y evidencias docentes se distribuyen aparte. La carpeta `material/` se mantiene local y excluida de Git; no es necesaria para registrar prompts desde una copia nueva.
 
-La [guía avanzada original](docs/README-avanzado.md) conserva el contexto histórico de construcción; sus referencias al recorrido de observabilidad son anteriores a este paquete. [Documentación del agente avanzado](docs/00_indice.md).
-
-## Evidencia de preparación
-
-Consultar **[VERIFICACION](material/evidencias/VERIFICACION.md)** para saber qué se ejecutó realmente. Una presentación creada, un test local y una traza leída desde el servicio son pruebas distintas. El ensayo oral y la entrada en la reunión quedan a cargo del profesor.
+Se conserva el agente avanzado con juez, validador y búsqueda web: `python langgraph/avanzado/04_chatbot.py`. La [guía avanzada original](docs/README-avanzado.md) y el [índice histórico](docs/00_indice.md) documentan esa ampliación, no el recorrido principal de soporte. Las referencias históricas a materiales locales no implican que esos archivos estén presentes en una copia nueva.
